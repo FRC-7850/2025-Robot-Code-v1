@@ -18,7 +18,7 @@ import edu.wpi.first.wpilibj.SerialPort;
 import frc.robot.Constants.DriveConstants;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import com.kauailabs.navx.frc.*;
-
+import com.ctre.phoenix6.*;
 
 public class DriveSubsystem extends SubsystemBase {
   // Create MAXSwerveModules

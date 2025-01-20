@@ -19,6 +19,7 @@ import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.OIConstants;
 import frc.robot.subsystems.DriveSubsystem;
+import frc.robot.subsystems.IntakeSubsystem;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SwerveControllerCommand;
@@ -34,6 +35,8 @@ import java.util.List;
 public class RobotContainer {
   // The robot's subsystems
   private final DriveSubsystem m_robotDrive = new DriveSubsystem();
+  private final IntakeSubsystem m_robotIntake = new IntakeSubsystem();
+
 
   // The driver's controller
   XboxController m_driverController = new XboxController(OIConstants.kDriverControllerPort);
@@ -50,7 +53,6 @@ public class RobotContainer {
         // The left stick controls translation of the robot.
         // Turning is controlled by the X axis of the right stick.
 
-        //⚠️X and Y are switched right now⚠️
         new RunCommand(
             () -> m_robotDrive.drive(
                 -MathUtil.applyDeadband(m_driverController.getLeftY(), OIConstants.kDriveDeadband),
@@ -74,8 +76,19 @@ public class RobotContainer {
         .whileTrue(new RunCommand(
             () -> m_robotDrive.setX(),
             m_robotDrive));
+
+    new JoystickButton(m_driverController, Button.kL1.value)
+        .whileTrue(new RunCommand(
+            () -> m_robotIntake.Intake(true),
+            m_robotIntake));
+
+     new JoystickButton(m_driverController, Button.kL1.value)
+        .whileFalse(new RunCommand(
+            () -> m_robotIntake.Intake(false),
+            m_robotIntake));
   }
 
+  dgdfhshsdfhsdfhe
   /**
    * Use this to pass the autonomous command to the main {@link Robot} class.
    *

@@ -6,15 +6,16 @@ public class XboxOverride extends XboxController{
         super(Port);
     }
     @Override 
-    public double getRightX() {
-        var output = (super.getRightX() > .8) ? 1 : 0;
-            output = (super.getRightX() < -.8) ? -1 : 0;
+    public double getLeftX() {
+        var output = (super.getLeftX() > .8) ? 1 : 0;
+            output = (super.getLeftX() < -.8) ? -1 : 0;
         return output;
     }
     @Override
-    public double getRightY() {
-        var output = (super.getRightY() > .8) ? 1 : 0;
-            output = (super.getRightY() < -.8) ? -1 : 0;       
+    public double getLeftY() {
+        var output = (super.getLeftY() > .8) ? 1 : 0;
+            output = (super.getLeftY() < -.8) ? -1 : 0;       
      return output;
     }
+    
 }

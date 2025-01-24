@@ -14,8 +14,11 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj.SerialPort;
+import edu.wpi.first.wpilibj.motorcontrol.Spark;
+import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import frc.robot.Constants.DriveConstants;
@@ -24,6 +27,14 @@ import com.ctre.phoenix6.*;
 import com.ctre.phoenix6.hardware.*;
 
 public class DriveSubsystem extends SubsystemBase {
+  ShuffleboardTab TempTab = Shuffleboard.getTab("TempTab");
+  GenericEntry controllerXEntry;
+  GenericEntry controllerYEntry;
+  GenericEntry Sparky2;
+  GenericEntry Sparky4;
+  GenericEntry Sparky6;
+  GenericEntry Sparky8;
+  
   // Create MAXSwerveModules
   private final MAXSwerveModule m_frontLeft = new MAXSwerveModule(
       DriveConstants.kFrontLeftDrivingCanId,
@@ -62,6 +73,12 @@ public class DriveSubsystem extends SubsystemBase {
 
   /** Creates a new DriveSubsystem. */
   public DriveSubsystem() {
+    //controllerXEntry = TempTab.add("ControllerXOutput", 0).withWidget(BuiltInWidgets.kGraph).getEntry();
+    //controllerYEntry =TempTab.add("ControllerYOutput", 0).withWidget(BuiltInWidgets.kGraph).getEntry();
+    Sparky2 = TempTab.add("Spark2", 0).withWidget(BuiltInWidgets.kGraph).getEntry();
+    Sparky4 = TempTab.add("Spark4", 0).withWidget(BuiltInWidgets.kGraph).getEntry();
+    Sparky6 = TempTab.add("Spark6", 0).withWidget(BuiltInWidgets.kGraph).getEntry();
+    Sparky8 = TempTab.add("Spark8", 0).withWidget(BuiltInWidgets.kGraph).getEntry();
     // Usage reporting for MAXSwerve template
     HAL.report(tResourceType.kResourceType_RobotDrive, tInstances.kRobotDriveSwerve_MaxSwerve);
   }
@@ -116,9 +133,12 @@ public class DriveSubsystem extends SubsystemBase {
    */
   public void drive(double xSpeed, double ySpeed, double rot, boolean fieldRelative) {
     // Convert the commanded speeds into the correct units for the drivetrain
-    ShuffleboardTab TempTab = Shuffleboard.getTab("Tab Title");
-    // TempTab.add("ControllerXOutput", xSpeed);
-    // TempTab.add("ControllerYOutput", ySpeed);
+    //controllerXEntry.setDouble(xSpeed);
+    //controllerYEntry.setDouble(ySpeed);
+    Sparky2.setDouble(m_frontRight.getPosition().angle.getDegrees());
+    Sparky4.setDouble(m_rearRight.getPosition().angle.getDegrees());
+    Sparky6.setDouble(m_rearLeft.getPosition().angle.getDegrees());
+    Sparky8.setDouble(m_frontLeft.getPosition().angle.getDegrees());
     double xSpeedDelivered = xSpeed * DriveConstants.kMaxSpeedMetersPerSecond;
     double ySpeedDelivered = ySpeed * DriveConstants.kMaxSpeedMetersPerSecond;
     double rotDelivered = rot * DriveConstants.kMaxAngularSpeed;

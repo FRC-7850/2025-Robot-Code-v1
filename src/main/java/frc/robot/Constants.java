@@ -86,6 +86,11 @@ public final class Constants {
   public static final class OIConstants {
     public static final int kDriverControllerPort = 0;
     public static final double kDriveDeadband = 0.1;
+
+    public static final int kElevatorCanIDLeft = 34;
+    public static final int kElevatorCanIDRight = 21;
+
+    public static final int kOperationsControllerPort = 1;
   }
 
   public static final class AutoConstants {
@@ -105,5 +110,11 @@ public final class Constants {
 
   public static final class NeoMotorConstants {
     public static final double kFreeSpeedRpm = 5676;
+  }
+
+  public static final class ElevatorConstants{
+    public static final int kUpButton = 2;
+    public static final int kDownButton = 1;
+    public static final double kElevatorMaxSpeed = 0.1;
   }
 }

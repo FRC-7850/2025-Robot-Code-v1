@@ -1,13 +1,13 @@
 package frc.robot.subsystems;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import com.revrobotics.spark.SparkFlex;
+import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 
 import frc.robot.Constants.IntakeConstants;;
 
 public class IntakeSubsystem extends SubsystemBase {
-    private final SparkFlex m_topMotor = new SparkFlex(IntakeConstants.kIntakeTopMotorID, MotorType.kBrushless);
-    private final SparkFlex m_bottomMotor = new SparkFlex(IntakeConstants.kIntakeBottomMotorID, MotorType.kBrushless);
+    private final SparkMax m_topMotor = new SparkMax(IntakeConstants.kIntakeTopMotorID, MotorType.kBrushless);
+    private final SparkMax m_bottomMotor = new SparkFMax(IntakeConstants.kIntakeBottomMotorID, MotorType.kBrushless);
 
     public void Intake(boolean input){
         int speed = input ? 1 : 0;

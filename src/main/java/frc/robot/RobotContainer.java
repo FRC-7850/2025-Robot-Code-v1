@@ -19,10 +19,15 @@ import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.OIConstants;
 import frc.robot.subsystems.DriveSubsystem;
+import frc.robot.subsystems.ElevatorSubsystem;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SwerveControllerCommand;
+import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+
+import java.lang.reflect.GenericArrayType;
 import java.util.List;
 
 /*
@@ -34,9 +39,11 @@ import java.util.List;
 public class RobotContainer {
   // The robot's subsystems
   private final DriveSubsystem m_robotDrive = new DriveSubsystem();
+  private final ElevatorSubsystem m_robotElevator = new ElevatorSubsystem();
 
-  // The driver's controller
+  // The robot controllers
   XboxController m_driverController = new XboxController(OIConstants.kDriverControllerPort);
+  CommandJoystick m_logitechController = new CommandJoystick(OIConstants.kOperationsControllerPort);
 
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -50,7 +57,6 @@ public class RobotContainer {
         // The left stick controls translation of the robot.
         // Turning is controlled by the X axis of the right stick.
 
-        //⚠️X and Y are switched right now⚠️
         new RunCommand(
             () -> m_robotDrive.drive(
                 -MathUtil.applyDeadband(m_driverController.getLeftY(), OIConstants.kDriveDeadband),
@@ -70,10 +76,17 @@ public class RobotContainer {
    * {@link JoystickButton}.
    */
   private void configureButtonBindings() {
+    //Drive Command
     new JoystickButton(m_driverController, Button.kR1.value)
         .whileTrue(new RunCommand(
             () -> m_robotDrive.setX(),
             m_robotDrive));
+
+    //Elevator Controls
+    m_logitechController.povDown().onTrue(Commands.runOnce(() -> m_robotElevator.RunElevator(1)));
+    m_logitechController.povUp().onTrue(Commands.runOnce(() -> m_robotElevator.RunElevator(-1)));
+    m_logitechController.povDown().onFalse(Commands.runOnce(() -> m_robotElevator.RunElevator(0)));
+    m_logitechController.povUp().onFalse(Commands.runOnce(() -> m_robotElevator.RunElevator(0)));
   }
 
   /**

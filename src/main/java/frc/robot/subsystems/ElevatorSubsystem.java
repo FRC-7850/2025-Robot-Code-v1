@@ -13,15 +13,18 @@ public class ElevatorSubsystem {
      GenericEntry turns;
 
      private final SparkMax m_leftMotor = new SparkMax(OIConstants.kElevatorCanIDLeft, MotorType.kBrushless);
-     // private final SparkMax m_rightMotor = new SparkMax(OIConstants.kElevatorCanIDRight, MotorType.kBrushless);
+     private final SparkMax m_rightMotor = new SparkMax(OIConstants.kElevatorCanIDRight, MotorType.kBrushless);
+
     
      public void RunElevator(int polarity){
-          System.out.println("Seen");
+          System.out.print(polarity);
+          //m_leftMotor.isFollower();
+          
           double speed = ElevatorConstants.kElevatorMaxSpeed * polarity;
-          if(speed != 0){
+          
                m_leftMotor.set(speed);
-               // m_rightMotor.set(speed);
-          }
+               m_rightMotor.set(-speed);
+          
      }
 
      public ElevatorSubsystem(){

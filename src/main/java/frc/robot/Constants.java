@@ -115,6 +115,6 @@ public final class Constants {
   public static final class ElevatorConstants{
     public static final int kUpButton = 2;
     public static final int kDownButton = 1;
-    public static final double kElevatorMaxSpeed = 0.1;
+    public static final double kElevatorMaxSpeed = 1;
   }
 }

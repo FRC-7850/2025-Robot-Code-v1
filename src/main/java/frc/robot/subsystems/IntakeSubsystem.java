@@ -11,13 +11,13 @@ public class IntakeSubsystem extends SubsystemBase {
 
     public void Intake(boolean input){
         int speed = input ? 1 : 0;
-        m_topMotor.set(IntakeConstants.kIntakeSpeed*speed);
+        m_topMotor.set(-IntakeConstants.kIntakeSpeed*speed);
         m_bottomMotor.set(-IntakeConstants.kIntakeSpeed*speed);
     }
 
     public void Shoot(boolean input){
         int speed = input ? 1 : 0;
-        m_topMotor.set(-IntakeConstants.kIntakeSpeed*speed);
+        m_topMotor.set(IntakeConstants.kIntakeSpeed*speed);
         m_bottomMotor.set(IntakeConstants.kIntakeSpeed*speed);
     }
 }

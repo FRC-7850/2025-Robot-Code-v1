@@ -86,9 +86,19 @@ public class RobotContainer {
         .whileFalse(new RunCommand(
             () -> m_robotIntake.Intake(false),
             m_robotIntake));
+
+            new JoystickButton(m_driverController, Button.kCross.value)
+            .whileTrue(new RunCommand(
+                () -> m_robotIntake.Shoot(true),
+                m_robotIntake));
+    
+         new JoystickButton(m_driverController, Button.kCross.value)
+            .whileFalse(new RunCommand(
+                () -> m_robotIntake.Shoot(false),
+                m_robotIntake));
   }
 
-  dgdfhshsdfhsdfhe
+  
   /**
    * Use this to pass the autonomous command to the main {@link Robot} class.
    *

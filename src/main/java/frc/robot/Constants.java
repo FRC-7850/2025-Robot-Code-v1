@@ -111,6 +111,6 @@ public final class Constants {
     public static final int kIntakeTopMotorID = 9;
     public static final int kIntakeBottomMotorID = 10;
 
-    public static final double kIntakeSpeed = .5;
+    public static final double kIntakeSpeed = 1;
   }
 }

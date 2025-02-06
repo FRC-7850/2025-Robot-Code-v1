@@ -8,6 +8,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.AddressableLED;
 
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide
@@ -86,6 +87,20 @@ public final class Constants {
   public static final class OIConstants {
     public static final int kDriverControllerPort = 0;
     public static final double kDriveDeadband = 0.1;
+  }
+
+  public static final class LEDConstants {
+
+    public static final int LEDPWM = 0;
+    public static final int NUMLED = 50;
+    public static final int BRIGHTPERCENT = 50;
+    public static final int TEAMRGB1[] = {255,0,0};
+    public static final int TEAMRGB2[] = {255,255,255};
+    public static final int UNDERGLOWSTART = 0;
+    public static final int UNDERGLOWEND = 24;
+    public static final int ELEVATORSTART = 25;
+    public static final int ELEVATOREND = 49;
+
   }
 
   public static final class AutoConstants {

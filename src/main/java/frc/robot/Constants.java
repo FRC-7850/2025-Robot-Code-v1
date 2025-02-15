@@ -95,10 +95,10 @@ public final class Constants {
     public static final int BRIGHTPERCENT = 50;
     public static final int TEAMRGB1[] = {255,0,0};
     public static final int TEAMRGB2[] = {255,255,255};
-    public static final int UNDERGLOWSTART = 0;
-    public static final int UNDERGLOWEND = 120;
-    public static final int ELEVATORSTART = 121;
-    public static final int ELEVATOREND = 149;
+    public static final int UNDERGLOWSTART = 53;
+    public static final int UNDERGLOWEND = 55;
+    public static final int ELEVATORSTART = 0;
+    public static final int ELEVATOREND = 52;
 
   }
 

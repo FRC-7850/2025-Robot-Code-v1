@@ -26,6 +26,8 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SwerveControllerCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
+import edu.wpi.first.wpilibj2.command.button.CommandPS4Controller;
+import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.POVButton;
 
@@ -46,7 +48,7 @@ public class RobotContainer {
 
   // The robot controllers
   XboxController m_driverController = new XboxController(OIConstants.kDriverControllerPort);
-  CommandJoystick m_logitechController = new CommandJoystick(OIConstants.kOperationsControllerPort);
+  CommandXboxController m_logitechController = new CommandXboxController(OIConstants.kOperationsControllerPort);
 
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -84,6 +86,11 @@ public class RobotContainer {
         .whileTrue(new RunCommand(
             () -> m_robotDrive.setX(),
             m_robotDrive));
+
+
+            m_logitechController.y().onTrue(Commands.runOnce(
+                () -> m_robotElevator.zeroEleEncoder(),m_robotElevator));
+
 
     //Elevator Controls
     m_logitechController.povDown().onTrue(Commands.runOnce(() -> m_robotElevator.RunElevator(1)));
@@ -137,4 +144,6 @@ public class RobotContainer {
     // Run path following command, then stop at the end.
     return swerveControllerCommand.andThen(() -> m_robotDrive.drive(0, 0, 0, false));
   }
+
+
 }

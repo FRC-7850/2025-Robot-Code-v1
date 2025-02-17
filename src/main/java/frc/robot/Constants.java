@@ -93,6 +93,20 @@ public final class Constants {
     public static final int kOperationsControllerPort = 1;
   }
 
+  public static final class LEDConstants {
+
+    public static final int LEDPWM = 0;
+    public static final int NUMLED = 150;
+    public static final int BRIGHTPERCENT = 50;
+    public static final int TEAMRGB1[] = {255,0,0};
+    public static final int TEAMRGB2[] = {255,255,255};
+    public static final int UNDERGLOWSTART = 53;
+    public static final int UNDERGLOWEND = 55;
+    public static final int ELEVATORSTART = 0;
+    public static final int ELEVATOREND = 52;
+
+  }
+
   public static final class AutoConstants {
     public static final double kMaxSpeedMetersPerSecond = 3;
     public static final double kMaxAccelerationMetersPerSecondSquared = 3;

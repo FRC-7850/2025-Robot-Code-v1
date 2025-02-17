@@ -13,7 +13,11 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.math.trajectory.TrajectoryGenerator;
+
+import edu.wpi.first.wpilibj.PS4Controller;
+
 import edu.wpi.first.wpilibj.DriverStation;
+
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.PS4Controller.Button;
@@ -21,13 +25,26 @@ import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.OIConstants;
 import frc.robot.subsystems.DriveSubsystem;
+import frc.robot.subsystems.ElevatorSubsystem;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SwerveControllerCommand;
+import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
+import edu.wpi.first.wpilibj2.command.button.CommandPS4Controller;
+import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+
+import edu.wpi.first.wpilibj2.command.button.POVButton;
+
 import java.util.List;
 import frc.robot.subsystems.LEDs;;
 
+
+import java.lang.reflect.GenericArrayType;
+import java.util.List;
+//import edu.wpi.first.wpilibj2.command.button.PS4Controller;
+//import edu.wpi.first.wpilibj.PS4Controller;
 /*
  * This class is where the bulk of the robot should be declared.  Since Command-based is a
  * "declarative" paradigm, very little robot logic should actually be handled in the {@link Robot}
@@ -37,10 +54,15 @@ import frc.robot.subsystems.LEDs;;
 public class RobotContainer {
   // The robot's subsystems
   private final DriveSubsystem m_robotDrive = new DriveSubsystem();
+
+  private final ElevatorSubsystem m_robotElevator = new ElevatorSubsystem();
+
   private final LEDs m_leds = new LEDs();
 
-  // The driver's controller
+
+  // The robot controllers
   XboxController m_driverController = new XboxController(OIConstants.kDriverControllerPort);
+  CommandXboxController m_logitechController = new CommandXboxController(OIConstants.kOperationsControllerPort);
 
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -55,7 +77,6 @@ public class RobotContainer {
         // The left stick controls translation of the robot.
         // Turning is controlled by the X axis of the right stick.
 
-        //⚠️X and Y are switched right now⚠️
         new RunCommand(
             () -> m_robotDrive.drive(
                 -MathUtil.applyDeadband(m_driverController.getLeftY(), OIConstants.kDriveDeadband),
@@ -75,11 +96,23 @@ public class RobotContainer {
    * {@link JoystickButton}.
    */
   private void configureButtonBindings() {
+    //Drive Command
     new JoystickButton(m_driverController, Button.kR1.value)
         .whileTrue(new RunCommand(
             () -> m_robotDrive.setX(),
             m_robotDrive));
 
+
+
+            m_logitechController.y().onTrue(Commands.runOnce(
+                () -> m_robotElevator.zeroEleEncoder(),m_robotElevator));
+
+
+    //Elevator Controls
+    m_logitechController.povDown().onTrue(Commands.runOnce(() -> m_robotElevator.RunElevator(1)));
+    m_logitechController.povUp().onTrue(Commands.runOnce(() -> m_robotElevator.RunElevator(-1)));
+    m_logitechController.povDown().onFalse(Commands.runOnce(() -> m_robotElevator.RunElevator(0)));
+    m_logitechController.povUp().onFalse(Commands.runOnce(() -> m_robotElevator.RunElevator(0)));
     new JoystickButton(m_driverController, edu.wpi.first.wpilibj.XboxController.Button.kA.value)
         .onTrue(new RunCommand(
             () -> m_leds.setElevatorGradiant(),
@@ -89,6 +122,7 @@ public class RobotContainer {
     .onTrue(new RunCommand(
         () -> m_leds.setElevatorRSL(),
         m_leds));
+
 
   }
 
@@ -137,4 +171,6 @@ public class RobotContainer {
     // Run path following command, then stop at the end.
     return swerveControllerCommand.andThen(() -> m_robotDrive.drive(0, 0, 0, false));
   }
+
+
 }

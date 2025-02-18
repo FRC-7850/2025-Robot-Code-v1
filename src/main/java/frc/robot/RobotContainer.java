@@ -38,7 +38,7 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.POVButton;
 
 import java.util.List;
-import frc.robot.subsystems.LEDs;;
+import frc.robot.subsystems.LEDs;
 
 
 import java.lang.reflect.GenericArrayType;
@@ -62,7 +62,7 @@ public class RobotContainer {
 
   // The robot controllers
   XboxController m_driverController = new XboxController(OIConstants.kDriverControllerPort);
-  CommandXboxController m_logitechController = new CommandXboxController(OIConstants.kOperationsControllerPort);
+  CommandXboxController m_operatorController = new CommandXboxController(OIConstants.kOperationsControllerPort);
 
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -104,24 +104,19 @@ public class RobotContainer {
 
 
 
-            m_logitechController.y().onTrue(Commands.runOnce(
+            m_operatorController.y().onTrue(Commands.runOnce(
                 () -> m_robotElevator.zeroEleEncoder(),m_robotElevator));
 
 
     //Elevator Controls
-    m_logitechController.povDown().onTrue(Commands.runOnce(() -> m_robotElevator.RunElevator(1)));
-    m_logitechController.povUp().onTrue(Commands.runOnce(() -> m_robotElevator.RunElevator(-1)));
-    m_logitechController.povDown().onFalse(Commands.runOnce(() -> m_robotElevator.RunElevator(0)));
-    m_logitechController.povUp().onFalse(Commands.runOnce(() -> m_robotElevator.RunElevator(0)));
-    new JoystickButton(m_driverController, edu.wpi.first.wpilibj.XboxController.Button.kA.value)
-        .onTrue(new RunCommand(
-            () -> m_leds.setElevatorGradiant(),
-            m_leds));
+    m_operatorController.povDown().onTrue(Commands.runOnce(() -> m_robotElevator.RunElevator(-1)));
+    m_operatorController.povUp().onTrue(Commands.runOnce(() -> m_robotElevator.RunElevator(1)));
+    m_operatorController.povDown().onFalse(Commands.runOnce(() -> m_robotElevator.RunElevator(0)));
+    m_operatorController.povUp().onFalse(Commands.runOnce(() -> m_robotElevator.RunElevator(0)));
 
-    new JoystickButton(m_driverController, edu.wpi.first.wpilibj.XboxController.Button.kB.value)
-    .onTrue(new RunCommand(
-        () -> m_leds.setElevatorRSL(),
-        m_leds));
+    m_operatorController.b().onTrue(Commands.runOnce(()->m_robotElevator.setToHeight(100)));
+    
+
 
 
   }

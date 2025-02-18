@@ -4,6 +4,10 @@
 
 package frc.robot;
 
+import java.lang.Thread.State;
+
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
@@ -104,6 +108,18 @@ public final class Constants {
   }
 
   public static final class NeoMotorConstants {
+
     public static final double kFreeSpeedRpm = 5676;
+  }
+
+  public static final class TransformConstants{
+    public static final double kCameraToRobotOffsetX = .1; //Axis through front
+    public static final double kCameraToRobotOffsetY = .1; //Axis through sides
+    public static final double kCameraToRobotOffsetZ = .1; //Vertical axis, will not be constant.
+    public static final Rotation3d kCameraToRobotOffsetTheta = new Rotation3d(0,0,0); //0,0,0 implies facing straight forward and level with bellypan
+    public static final Transform3d kCameraToRobot = new Transform3d(kCameraToRobotOffsetX, kCameraToRobotOffsetY, kCameraToRobotOffsetZ, kCameraToRobotOffsetTheta);
+
+    public static final class TagGoals{
+    }
   }
 }

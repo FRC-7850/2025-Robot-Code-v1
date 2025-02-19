@@ -39,6 +39,7 @@ public class ElevatorSubsystem extends SubsystemBase{
 
      private final SparkMax m_leftMotor = new SparkMax(OIConstants.kElevatorCanIDLeft, MotorType.kBrushless);
      private final SparkMax m_rightMotor = new SparkMax(OIConstants.kElevatorCanIDRight, MotorType.kBrushless);
+
      //private DiffPIDOutput_PIDOutputModeValue
      private double encoderOffset;
      private double eleSetSpeed = ElevatorConstants.kElevatorMaxSpeed;
@@ -53,7 +54,7 @@ public class ElevatorSubsystem extends SubsystemBase{
      public void RunElevator(int polarity){
           System.out.print(polarity);
           //m_leftMotor.isFollower();
-          
+        
           
           double speed = eleSetSpeed * polarity;
           
@@ -100,10 +101,8 @@ public class ElevatorSubsystem extends SubsystemBase{
 
      public void setToHeight(double setpoint){
           m_rightMotor.getClosedLoopController().setReference(eleSP.get().getDouble()+encoderOffset, SparkMax.ControlType.kPosition, ClosedLoopSlot.kSlot0);
-
      }
 
-     
      @Override
      public void periodic() {
          // TODO Auto-generated method stub

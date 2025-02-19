@@ -14,7 +14,6 @@ import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.math.trajectory.TrajectoryGenerator;
 import edu.wpi.first.util.concurrent.Event;
-import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.PS4Controller.Button;
@@ -55,7 +54,7 @@ public class RobotContainer {
   // The robot controllers
   XboxController m_driverController = new XboxController(OIConstants.kDriverControllerPort);
   CommandXboxController m_operatorController = new CommandXboxController(OIConstants.kOperationsControllerPort);
-  GenericHID m_operatorStation = new GenericHID(OIConstants.kButtonPanelControllerPort);
+  CommandJoystick m_operatorStation = new CommandJoystick(OIConstants.kButtonPanelControllerPort);
 
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -102,15 +101,21 @@ public class RobotContainer {
     m_operatorController.povDown().onFalse(Commands.runOnce(() -> m_robotElevator.RunElevator(0)));
     m_operatorController.povUp().onFalse(Commands.runOnce(() -> m_robotElevator.RunElevator(0)));
     // m_operatorController.b().onTrue(Commands.runOnce(()->m_robotElevator.setToHeight(100)));    
-    //Intake Controls
+
+    m_operatorController.axisGreaterThan(1, 0).onTrue(Commands.runOnce(() -> m_robotElevator.RunElevator(-1)));
+    //Intake Controls (DEMO!)
+    m_operatorController.a().onTrue(Commands.runOnce(() -> m_robotIntake.RunArm(1)));
+    m_operatorController.b().onFalse(Commands.runOnce(() -> m_robotIntake.RunArm(0)));
+    m_operatorController.a().onTrue(Commands.runOnce(() -> m_robotIntake.RunArm(-1)));
+    m_operatorController.b().onFalse(Commands.runOnce(() -> m_robotIntake.RunArm(0)));
 
     //Setpoint Controls
-    m_operatorStation.button(SetPointConstants.kBargeSetpointButton, new EventLoop());
-    m_operatorStation.button(SetPointConstants.kProcessorSetpointButton, new EventLoop());
-    m_operatorStation.button(SetPointConstants.kL3SetpointButton, null);
-    m_operatorStation.button(SetPointConstants.kL2SetpointButton, null);
-    m_operatorStation.button(SetPointConstants.kAlgaeOnCoralSetpointButton, null);
-    m_operatorStation.button(SetPointConstants.kAlgaeOnFloorSetpointButton, null);
+    m_operatorStation.button(SetPointConstants.kBargeSetpointButton).onTrue(Commands.runOnce(() -> m_robotIntake.ArmToSetpoint(SetPointConstants.kArmBargeSetpoint)));
+    m_operatorStation.button(SetPointConstants.kProcessorSetpointButton).onTrue(Commands.runOnce(() -> m_robotIntake.ArmToSetpoint(SetPointConstants.kArmProcessorSetpoint)));
+    m_operatorStation.button(SetPointConstants.kL2SetpointButton).onTrue(Commands.runOnce(() -> m_robotIntake.ArmToSetpoint(SetPointConstants.kArmL2Setpoint)));
+    m_operatorStation.button(SetPointConstants.kL3SetpointButton).onTrue(Commands.runOnce(() -> m_robotIntake.ArmToSetpoint(SetPointConstants.kArmL3Setpoint)));
+    m_operatorStation.button(SetPointConstants.kAlgaeOnCoralSetpointButton).onTrue(Commands.runOnce(() -> m_robotIntake.ArmToSetpoint(SetPointConstants.kArmAlgaeOnCoralSetpoint)));
+    m_operatorStation.button(SetPointConstants.kAlgaeOnFloorSetpointButton).onTrue(Commands.runOnce(() -> m_robotIntake.ArmToSetpoint(SetPointConstants.kArmFloorSetpoint)));
   }
 
   /**

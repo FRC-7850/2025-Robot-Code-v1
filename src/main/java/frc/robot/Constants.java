@@ -91,8 +91,15 @@ public final class Constants {
 
     public static final double kDriveDeadband = 0.1;
 
+    //Elevator
     public static final int kElevatorCanIDLeft = 21;
     public static final int kElevatorCanIDRight = 22;
+
+    //Arm/Intake (UNSET)
+    public static final int kArmCanIDLeft = 22;
+    public static final int kArmCanIDRight = 22;
+    public static final int kIntakeCanIDLeft = 22;
+    public static final int kIntakeCanIDRight = 22;
   }
 
   public static final class LEDConstants {

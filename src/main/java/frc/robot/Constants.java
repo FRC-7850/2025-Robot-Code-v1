@@ -86,12 +86,13 @@ public final class Constants {
 
   public static final class OIConstants {
     public static final int kDriverControllerPort = 0;
+    public static final int kOperationsControllerPort = 1;
+    public static final int kButtonPanelControllerPort = 2;
+
     public static final double kDriveDeadband = 0.1;
 
     public static final int kElevatorCanIDLeft = 21;
     public static final int kElevatorCanIDRight = 22;
-
-    public static final int kOperationsControllerPort = 1;
   }
 
   public static final class LEDConstants {
@@ -132,5 +133,38 @@ public final class Constants {
     public static final int kDownButton = 1;
     public static final double kElevatorMaxSpeed = .5;
     public static final double kS = 0, kG = 0, kV = 0, kA = 0, kP = 0, kI = 0, kD = 0;
+  }
+
+  public static final class IntakeConstants{
+    public static final int kUpButton = 2;
+    public static final int kDownButton = 1;
+    public static final double kIntakeSpeed = .5;
+    public static final double kArmFineTuneSpeed = .1;
+  }
+
+  public static final class SetPointConstants{
+    //Driverstation Button -> Setpoint Bindings (Unset)
+    public static final int kBargeSetpointButton = 0;
+    public static final int kProcessorSetpointButton = 1;
+    public static final int kL3SetpointButton = 2;
+    public static final int kL2SetpointButton = 3;
+    public static final int kAlgaeOnCoralSetpointButton = 4;
+    public static final int kAlgaeOnFloorSetpointButton = 5;
+
+    //Setpoint Values (Unset)
+      //Elevator
+      public static final double kElevatorBargeSetpoint = 0;
+      public static final double kElevatorProcessorSetpoint = 0;
+      public static final double kElevatorL3Setpoint = 0;
+      public static final double kElevatorL2Setpoint = 0;
+      public static final double kElevatorAlgaeOnCoralSetpoint = 0;
+      public static final double kElevatorFloorSetpoint = 0;
+       //Arm
+       public static final double kArmBargeSetpoint = 0;
+       public static final double kArmProcessorSetpoint = 0;
+       public static final double kArmL3Setpoint = 0;
+       public static final double kArmL2Setpoint = 0;
+       public static final double kArmAlgaeOnCoralSetpoint = 0;
+       public static final double kArmFloorSetpoint = 0;
   }
 }

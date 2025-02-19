@@ -13,36 +13,30 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.math.trajectory.TrajectoryGenerator;
-
-import edu.wpi.first.wpilibj.PS4Controller;
-
-import edu.wpi.first.wpilibj.DriverStation;
-
+import edu.wpi.first.util.concurrent.Event;
+import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.PS4Controller.Button;
+import edu.wpi.first.wpilibj.event.EventLoop;
 import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.OIConstants;
+import frc.robot.Constants.SetPointConstants;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.ElevatorSubsystem;
+import frc.robot.subsystems.IntakeSubsystem;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SwerveControllerCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
-import edu.wpi.first.wpilibj2.command.button.CommandPS4Controller;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
-
 import edu.wpi.first.wpilibj2.command.button.POVButton;
-
 import java.util.List;
 import frc.robot.subsystems.LEDs;
 
-
-import java.lang.reflect.GenericArrayType;
-import java.util.List;
 //import edu.wpi.first.wpilibj2.command.button.PS4Controller;
 //import edu.wpi.first.wpilibj.PS4Controller;
 /*
@@ -54,15 +48,14 @@ import java.util.List;
 public class RobotContainer {
   // The robot's subsystems
   private final DriveSubsystem m_robotDrive = new DriveSubsystem();
-
   private final ElevatorSubsystem m_robotElevator = new ElevatorSubsystem();
-
+  private final IntakeSubsystem m_robotIntake = new IntakeSubsystem();
   private final LEDs m_leds = new LEDs();
-
 
   // The robot controllers
   XboxController m_driverController = new XboxController(OIConstants.kDriverControllerPort);
   CommandXboxController m_operatorController = new CommandXboxController(OIConstants.kOperationsControllerPort);
+  GenericHID m_operatorStation = new GenericHID(OIConstants.kButtonPanelControllerPort);
 
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -71,12 +64,10 @@ public class RobotContainer {
     // Configure the button bindings
     configureButtonBindings();
     
-    
     // Configure default commands
     m_robotDrive.setDefaultCommand(
         // The left stick controls translation of the robot.
         // Turning is controlled by the X axis of the right stick.
-
         new RunCommand(
             () -> m_robotDrive.drive(
                 -MathUtil.applyDeadband(m_driverController.getLeftY(), OIConstants.kDriveDeadband),
@@ -102,23 +93,24 @@ public class RobotContainer {
             () -> m_robotDrive.setX(),
             m_robotDrive));
 
-
-
             m_operatorController.y().onTrue(Commands.runOnce(
                 () -> m_robotElevator.zeroEleEncoder(),m_robotElevator));
-
 
     //Elevator Controls
     m_operatorController.povDown().onTrue(Commands.runOnce(() -> m_robotElevator.RunElevator(-1)));
     m_operatorController.povUp().onTrue(Commands.runOnce(() -> m_robotElevator.RunElevator(1)));
     m_operatorController.povDown().onFalse(Commands.runOnce(() -> m_robotElevator.RunElevator(0)));
     m_operatorController.povUp().onFalse(Commands.runOnce(() -> m_robotElevator.RunElevator(0)));
+    // m_operatorController.b().onTrue(Commands.runOnce(()->m_robotElevator.setToHeight(100)));    
+    //Intake Controls
 
-    m_operatorController.b().onTrue(Commands.runOnce(()->m_robotElevator.setToHeight(100)));
-    
-
-
-
+    //Setpoint Controls
+    m_operatorStation.button(SetPointConstants.kBargeSetpointButton, new EventLoop());
+    m_operatorStation.button(SetPointConstants.kProcessorSetpointButton, new EventLoop());
+    m_operatorStation.button(SetPointConstants.kL3SetpointButton, null);
+    m_operatorStation.button(SetPointConstants.kL2SetpointButton, null);
+    m_operatorStation.button(SetPointConstants.kAlgaeOnCoralSetpointButton, null);
+    m_operatorStation.button(SetPointConstants.kAlgaeOnFloorSetpointButton, null);
   }
 
   /**
@@ -166,6 +158,4 @@ public class RobotContainer {
     // Run path following command, then stop at the end.
     return swerveControllerCommand.andThen(() -> m_robotDrive.drive(0, 0, 0, false));
   }
-
-
 }

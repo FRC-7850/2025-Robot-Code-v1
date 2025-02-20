@@ -96,10 +96,10 @@ public final class Constants {
     public static final int kElevatorCanIDRight = 22;
 
     //Arm/Intake (UNSET)
-    public static final int kArmCanIDLeft = 22;
-    public static final int kArmCanIDRight = 22;
-    public static final int kIntakeCanIDLeft = 22;
-    public static final int kIntakeCanIDRight = 22;
+    public static final int kArmCanIDLeft = 41;
+    public static final int kArmCanIDRight = 40;
+    public static final int kIntakeCanIDLeft = 30;
+    public static final int kIntakeCanIDRight = 31;
   }
 
   public static final class LEDConstants {
@@ -146,7 +146,7 @@ public final class Constants {
     public static final int kUpButton = 2;
     public static final int kDownButton = 1;
     public static final double kIntakeSpeed = .5;
-    public static final double kArmFineTuneSpeed = .1;
+    public static final double kArmFineTuneSpeed = .5;
   }
 
   public static final class SetPointConstants{

@@ -96,18 +96,25 @@ public class RobotContainer {
                 () -> m_robotElevator.zeroEleEncoder(),m_robotElevator));
 
     //Elevator Controls
-    m_operatorController.povDown().onTrue(Commands.runOnce(() -> m_robotElevator.RunElevator(-1)));
-    m_operatorController.povUp().onTrue(Commands.runOnce(() -> m_robotElevator.RunElevator(1)));
-    m_operatorController.povDown().onFalse(Commands.runOnce(() -> m_robotElevator.RunElevator(0)));
-    m_operatorController.povUp().onFalse(Commands.runOnce(() -> m_robotElevator.RunElevator(0)));
-    // m_operatorController.b().onTrue(Commands.runOnce(()->m_robotElevator.setToHeight(100)));    
+    // m_operatorController.povDown().onTrue(Commands.runOnce(() -> m_robotElevator.RunElevator(-1)));
+    // m_operatorController.povUp().onTrue(Commands.runOnce(() -> m_robotElevator.RunElevator(1)));
+    // m_operatorController.povDown().onFalse(Commands.runOnce(() -> m_robotElevator.RunElevator(0)));
+    // m_operatorController.povUp().onFalse(Commands.runOnce(() -> m_robotElevator.RunElevator(0)));
+    // m_operatorController.axisGreaterThan(1, 0.1).onTrue(Commands.runOnce(() -> m_robotElevator.RunElevator(-1)));
+    // m_operatorController.axisLessTHan(1, 0.1).onTrue(Commands.runOnce(() -> m_robotElevator.RunElevator(-1)));
+    m_operatorController.axisGreaterThan(1, 0.1).onTrue(Commands.runOnce(() -> m_robotElevator.RunElevator(m_operatorController.getLeftY())));
+    m_operatorController.axisLessThan(1, -0.1).onTrue(Commands.runOnce(() -> m_robotElevator.RunElevator(m_operatorController.getLeftY())));
+    m_operatorController.x().onTrue(Commands.runOnce(() -> m_robotElevator.RunElevator(0)));
 
-    m_operatorController.axisGreaterThan(1, 0).onTrue(Commands.runOnce(() -> m_robotElevator.RunElevator(-1)));
     //Intake Controls (DEMO!)
-    m_operatorController.a().onTrue(Commands.runOnce(() -> m_robotIntake.RunArm(1)));
-    m_operatorController.b().onFalse(Commands.runOnce(() -> m_robotIntake.RunArm(0)));
-    m_operatorController.a().onTrue(Commands.runOnce(() -> m_robotIntake.RunArm(-1)));
-    m_operatorController.b().onFalse(Commands.runOnce(() -> m_robotIntake.RunArm(0)));
+    m_operatorController.povUp().onTrue(Commands.runOnce(() -> m_robotIntake.RunArm(1)));
+    m_operatorController.povUp().onFalse(Commands.runOnce(() -> m_robotIntake.RunArm(0)));
+    m_operatorController.povDown().onTrue(Commands.runOnce(() -> m_robotIntake.RunArm(-1)));
+    m_operatorController.povDown().onFalse(Commands.runOnce(() -> m_robotIntake.RunArm(0)));
+    m_operatorController.leftBumper().onTrue(Commands.runOnce(() -> m_robotIntake.RunIntake(1)));
+    m_operatorController.leftBumper().onFalse(Commands.runOnce(() -> m_robotIntake.RunIntake(0)));
+    m_operatorController.leftTrigger().onTrue(Commands.runOnce(() -> m_robotIntake.RunIntake(-1)));
+    m_operatorController.leftTrigger().onFalse(Commands.runOnce(() -> m_robotIntake.RunIntake(-1)));
 
     //Setpoint Controls
     m_operatorStation.button(SetPointConstants.kBargeSetpointButton).onTrue(Commands.runOnce(() -> m_robotIntake.ArmToSetpoint(SetPointConstants.kArmBargeSetpoint)));
@@ -116,6 +123,8 @@ public class RobotContainer {
     m_operatorStation.button(SetPointConstants.kL3SetpointButton).onTrue(Commands.runOnce(() -> m_robotIntake.ArmToSetpoint(SetPointConstants.kArmL3Setpoint)));
     m_operatorStation.button(SetPointConstants.kAlgaeOnCoralSetpointButton).onTrue(Commands.runOnce(() -> m_robotIntake.ArmToSetpoint(SetPointConstants.kArmAlgaeOnCoralSetpoint)));
     m_operatorStation.button(SetPointConstants.kAlgaeOnFloorSetpointButton).onTrue(Commands.runOnce(() -> m_robotIntake.ArmToSetpoint(SetPointConstants.kArmFloorSetpoint)));
+
+    //Barge Controls
   }
 
   /**

@@ -50,7 +50,7 @@ public class ElevatorSubsystem extends SubsystemBase{
               100));
      //private SparkMaxConfig config;
     
-     public void RunElevator(int polarity){
+     public void RunElevator(double polarity){
           System.out.print(polarity);
           //m_leftMotor.isFollower();
           

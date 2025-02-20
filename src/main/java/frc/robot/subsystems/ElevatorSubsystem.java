@@ -98,7 +98,7 @@ public class ElevatorSubsystem extends SubsystemBase{
 
 
 
-     public void setToHeight(double setpoint){
+     public void setToHeight(){
           m_rightMotor.getClosedLoopController().setReference(eleSP.get().getDouble()+encoderOffset, SparkMax.ControlType.kPosition, ClosedLoopSlot.kSlot0);
 
      }

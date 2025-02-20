@@ -105,6 +105,7 @@ public class RobotContainer {
     m_operatorController.axisGreaterThan(1, 0.1).onTrue(Commands.runOnce(() -> m_robotElevator.RunElevator(m_operatorController.getLeftY())));
     m_operatorController.axisLessThan(1, -0.1).onTrue(Commands.runOnce(() -> m_robotElevator.RunElevator(m_operatorController.getLeftY())));
     m_operatorController.x().onTrue(Commands.runOnce(() -> m_robotElevator.RunElevator(0)));
+    m_operatorController.a().onTrue(Commands.runOnce(() -> m_robotElevator.setToHeight()));
 
     //Intake Controls (DEMO!)
     m_operatorController.povUp().onTrue(Commands.runOnce(() -> m_robotIntake.RunArm(1)));

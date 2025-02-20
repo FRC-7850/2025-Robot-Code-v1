@@ -114,7 +114,7 @@ public class RobotContainer {
     m_operatorController.povDown().onFalse(Commands.runOnce(() -> m_robotElevator.RunElevator(0)));
     m_operatorController.povUp().onFalse(Commands.runOnce(() -> m_robotElevator.RunElevator(0)));
 
-    m_operatorController.b().onTrue(Commands.runOnce(()->m_robotElevator.setToHeight(100)));
+    m_operatorController.b().onTrue(Commands.runOnce(()->m_robotElevator.setToHeight()));
     
 
 

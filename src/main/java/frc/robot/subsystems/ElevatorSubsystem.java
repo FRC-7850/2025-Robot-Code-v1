@@ -33,13 +33,13 @@ import edu.wpi.first.math.controller.ElevatorFeedforward;
 
 
 public class ElevatorSubsystem extends SubsystemBase{
+     
      ShuffleboardTab elevatorTestingTab = Shuffleboard.getTab("ElevatorTestingTab");
      GenericEntry turns, turnRate, eleSpeed, eleSP;
 
 
      private final SparkMax m_leftMotor = new SparkMax(OIConstants.kElevatorCanIDLeft, MotorType.kBrushless);
      private final SparkMax m_rightMotor = new SparkMax(OIConstants.kElevatorCanIDRight, MotorType.kBrushless);
-
      //private DiffPIDOutput_PIDOutputModeValue
      private double encoderOffset;
      private double eleSetSpeed = ElevatorConstants.kElevatorMaxSpeed;
@@ -51,35 +51,19 @@ public class ElevatorSubsystem extends SubsystemBase{
               100));
      //private SparkMaxConfig config;
     
-     public void RunElevator(int polarity){
+     public void RunElevator(double polarity){
           System.out.print(polarity);
-          //m_leftMotor.isFollower();
-        
-          
           double speed = eleSetSpeed * polarity;
-          
-               //m_leftMotor.set(-speed);
                m_rightMotor.set(speed);
-
-               
-               
-               
-          
      }
+
      public void zeroEleEncoder(){
-
           encoderOffset = m_rightMotor.getEncoder().getPosition();
-
      }
 
      public double getEleEncoder(){
-          
           return m_rightMotor.getEncoder().getPosition() - encoderOffset;
-
      }
- 
-
-
 
      public ElevatorSubsystem(){
           turns = elevatorTestingTab.add("Spark2 Poition", 0).getEntry();
@@ -90,16 +74,9 @@ public class ElevatorSubsystem extends SubsystemBase{
           turns.setDouble(getEleEncoder());
           turnRate.setDouble(m_rightMotor.getEncoder().getVelocity());
           elevatorPID.setTolerance(.25);
-          //config.inverted(true);
-          //config.idleMode(SparkBaseConfig.IdleMode.kBrake);
-          
-          //m_rightMotor.configure(config, SparkBase.ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-          
      }
 
-
-
-     public void setToHeight(double setpoint){
+     public void setToHeight(){
           m_rightMotor.getClosedLoopController().setReference(eleSP.get().getDouble()+encoderOffset, SparkMax.ControlType.kPosition, ClosedLoopSlot.kSlot0);
      }
 

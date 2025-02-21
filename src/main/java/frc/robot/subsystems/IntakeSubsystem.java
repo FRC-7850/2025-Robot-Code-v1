@@ -41,7 +41,7 @@ public class IntakeSubsystem extends SubsystemBase{
      }
 
      public double getArmEncoder(){
-          return m_armMotorLeft.getEncoder().getPosition();
+          return m_armMotorRight.getEncoder().getPosition();
      }
 
      public void ArmToSetpoint(double setpoint){

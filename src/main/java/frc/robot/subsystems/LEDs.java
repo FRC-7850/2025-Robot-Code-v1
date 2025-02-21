@@ -3,6 +3,7 @@ package frc.robot.subsystems;
 import static edu.wpi.first.units.Units.Percent;
 import static edu.wpi.first.units.Units.Second;
 
+import java.lang.module.ModuleDescriptor.Requires;
 import java.time.Year;
 import java.util.Map;
 
@@ -19,6 +20,7 @@ import edu.wpi.first.wpilibj.LEDPattern;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
+import frc.robot.subsystems.ElevatorSubsystem;
 
 public class LEDs extends SubsystemBase{
 
@@ -32,14 +34,17 @@ public class LEDs extends SubsystemBase{
 
     Comparable<DriverStation.Alliance> allianceComparable = null;
     LEDPattern allOff = LEDPattern.solid(Color.kBlack);
-    public LEDs(){
+    ElevatorSubsystem m_elevatorSubsystem;
+    public LEDs(ElevatorSubsystem Elevator){
         
+        m_elevatorSubsystem = Elevator;
         m_led.setLength(m_ledBuffer.getLength());
         //allOff.applyTo(m_ledBuffer);
         //allianceColor = LEDPattern.solid(RGB2GRB(Color.kWhite)).atBrightness(Percent.of(Constants.LEDConstants.BRIGHTPERCENT));
         allianceColor.applyTo(m_underglow); 
         //setElevatorGradiant();
         m_led.setData(m_ledBuffer);
+        
         
         m_led.start();
 
@@ -84,6 +89,12 @@ public class LEDs extends SubsystemBase{
         //m_led.setData(m_ledBuffer);
     }
 
+    public void setElevatorProgressLights(){
+
+        elevatorPattern = LEDPattern.steps(Map.of(0,RGB2GRB(Color.kWhite),m_elevatorSubsystem.getEleEncoder() /Constants.ElevatorConstants.kElevatorMaxHeight, RGB2GRB(Color.kRed)));
+        elevatorPattern.applyTo(m_elevator);
+        }
+
     public void setElevatorSteps(){
 
         elevatorPattern = LEDPattern.steps(Map.of(0,RGB2GRB(Color.kRed),0.5, RGB2GRB(Color.kWhite))).scrollAtRelativeSpeed(Percent.per(Second).of(25));
@@ -95,7 +106,8 @@ public class LEDs extends SubsystemBase{
     public void periodic() {
       // This method will be called once per scheduler run
       setUnderGlow(DriverStation.getAlliance().get());
-      setElevatorSteps();
+      //setElevatorSteps();
+      setElevatorProgressLights();
       m_led.setData(m_ledBuffer);
     }
 

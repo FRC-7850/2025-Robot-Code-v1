@@ -49,7 +49,7 @@ public class RobotContainer {
   private final DriveSubsystem m_robotDrive = new DriveSubsystem();
   private final ElevatorSubsystem m_robotElevator = new ElevatorSubsystem();
   private final IntakeSubsystem m_robotIntake = new IntakeSubsystem();
-  private final LEDs m_leds = new LEDs();
+  private final LEDs m_leds = new LEDs(m_robotElevator);
 
   // The robot controllers
   XboxController m_driverController = new XboxController(OIConstants.kDriverControllerPort);
@@ -75,6 +75,8 @@ public class RobotContainer {
                 false),
             m_robotDrive));
   }
+
+
 
   /**
    * Use this method to define your button->command mappings. Buttons can be
@@ -102,10 +104,10 @@ public class RobotContainer {
     // m_operatorController.povUp().onFalse(Commands.runOnce(() -> m_robotElevator.RunElevator(0)));
     // m_operatorController.axisGreaterThan(1, 0.1).onTrue(Commands.runOnce(() -> m_robotElevator.RunElevator(-1)));
     // m_operatorController.axisLessTHan(1, 0.1).onTrue(Commands.runOnce(() -> m_robotElevator.RunElevator(-1)));
-   // m_operatorController.axisGreaterThan(1, 0.1).onTrue(Commands.runOnce(() -> m_robotElevator.RunElevator(m_operatorController.getLeftY())));
+    //m_operatorController.axisGreaterThan(1, 0.1).onTrue(Commands.runOnce(() -> m_robotElevator.RunElevator(m_operatorController.getLeftY())));
     //m_operatorController.axisLessThan(1, -0.1).onTrue(Commands.runOnce(() -> m_robotElevator.RunElevator(m_operatorController.getLeftY())));
     m_operatorController.axisMagnitudeGreaterThan(1, 0.1).whileTrue(Commands.run(() -> m_robotElevator.RunElevator(m_operatorController.getLeftY())));
-    m_operatorController.axisMagnitudeGreaterThan(1, 0.1).onFalse(Commands.run(() -> m_robotElevator.RunElevator(0)));
+    m_operatorController.axisMagnitudeGreaterThan(1, 0.1).onFalse(Commands.runOnce(() -> m_robotElevator.RunElevator(0)));
     m_operatorController.x().onTrue(Commands.runOnce(() -> m_robotElevator.RunElevator(0)));
     m_operatorController.a().onTrue(Commands.runOnce(() -> m_robotElevator.setToHeight()));
 
@@ -175,4 +177,8 @@ public class RobotContainer {
     // Run path following command, then stop at the end.
     return swerveControllerCommand.andThen(() -> m_robotDrive.drive(0, 0, 0, false));
   }
+
+
+
+
 }

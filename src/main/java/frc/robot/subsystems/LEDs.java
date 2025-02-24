@@ -90,8 +90,11 @@ public class LEDs extends SubsystemBase{
     }
 
     public void setElevatorProgressLights(){
-
-        elevatorPattern = LEDPattern.steps(Map.of(0,RGB2GRB(Color.kWhite),m_elevatorSubsystem.getEleEncoder() /Constants.ElevatorConstants.kElevatorMaxHeight, RGB2GRB(Color.kRed)));
+        double elePer = m_elevatorSubsystem.getEleEncoder() /Constants.ElevatorConstants.kElevatorMaxHeight;
+        if(elePer < 0.01){
+            elePer = 0.01;
+        }
+        elevatorPattern = LEDPattern.steps(Map.of(0,RGB2GRB(Color.kWhite),elePer, RGB2GRB(Color.kRed)));
         elevatorPattern.applyTo(m_elevator);
         }
 
@@ -107,7 +110,12 @@ public class LEDs extends SubsystemBase{
       // This method will be called once per scheduler run
       setUnderGlow(DriverStation.getAlliance().get());
       //setElevatorSteps();
-      setElevatorProgressLights();
+      setElevatorSteps();
+      if(DriverStation.isEnabled()){
+        setElevatorProgressLights();
+      }
+      
+      
       m_led.setData(m_ledBuffer);
     }
 

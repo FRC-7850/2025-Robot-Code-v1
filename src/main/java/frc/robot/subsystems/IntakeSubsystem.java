@@ -27,13 +27,17 @@ public class IntakeSubsystem extends SubsystemBase{
     
      public void RunArm(double polarity){          
           double speed = armMaxSpeed * polarity;
-          m_armMotorRight.set(speed);
+          if (speed > 0){
+               m_armMotorLeft.set(polarity * 0.8);
+          }else{
+               m_armMotorLeft.set(polarity * 0.1);
+          }
      }
 
      public void RunIntake(double polarity){          
         double speed = intakeMaxSpeed * polarity;
-        m_intakeMotorRight.set(speed);
-        m_intakeMotorLeft.set(-speed);
+        m_intakeMotorRight.set(polarity);
+        m_intakeMotorLeft.set(-polarity);
    }
      
      public void zeroArmEncoder(){

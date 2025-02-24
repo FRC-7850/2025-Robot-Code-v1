@@ -54,7 +54,7 @@ public class RobotContainer {
   // The robot controllers
   XboxController m_driverController = new XboxController(OIConstants.kDriverControllerPort);
   CommandXboxController m_operatorController = new CommandXboxController(OIConstants.kOperationsControllerPort);
-  CommandJoystick m_operatorStation = new CommandJoystick(OIConstants.kButtonPanelControllerPort);
+//   CommandJoystick m_operatorStation = new CommandJoystick(OIConstants.kButtonPanelControllerPort);
 
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -104,14 +104,15 @@ public class RobotContainer {
     // m_operatorController.povUp().onFalse(Commands.runOnce(() -> m_robotElevator.RunElevator(0)));
     // m_operatorController.axisGreaterThan(1, 0.1).onTrue(Commands.runOnce(() -> m_robotElevator.RunElevator(-1)));
     // m_operatorController.axisLessTHan(1, 0.1).onTrue(Commands.runOnce(() -> m_robotElevator.RunElevator(-1)));
-    //m_operatorController.axisGreaterThan(1, 0.1).onTrue(Commands.runOnce(() -> m_robotElevator.RunElevator(m_operatorController.getLeftY())));
-    //m_operatorController.axisLessThan(1, -0.1).onTrue(Commands.runOnce(() -> m_robotElevator.RunElevator(m_operatorController.getLeftY())));
-    m_operatorController.axisMagnitudeGreaterThan(1, 0.1).whileTrue(Commands.run(() -> m_robotElevator.RunElevator(m_operatorController.getLeftY())));
-    m_operatorController.axisMagnitudeGreaterThan(1, 0.1).onFalse(Commands.runOnce(() -> m_robotElevator.RunElevator(0)));
+    m_operatorController.axisMagnitudeGreaterThan(1, 0.1).whileTrue(Commands.run(() -> m_robotElevator.RunElevator(-m_operatorController.getLeftY())));
+    m_operatorController.axisMagnitudeGreaterThan(1, 0.1).onTrue(Commands.runOnce(() -> m_robotElevator.RunElevator(0)));
+    // m_operatorController.axisMagnitudeGreaterThan(1, 0.1).whileTrue(Commands.run(() -> m_robotElevator.RunElevator(m_operatorController.getLeftY())));
+    // m_operatorController.axisMagnitudeGreaterThan(1, 0.1).onFalse(Commands.runOnce(() -> m_robotElevator.RunElevator(0)));
     m_operatorController.x().onTrue(Commands.runOnce(() -> m_robotElevator.RunElevator(0)));
-    m_operatorController.a().onTrue(Commands.runOnce(() -> m_robotElevator.setToHeight()));
+    //Disabled for Week Zero
+    // m_operatorController.a().onTrue(Commands.runOnce(() -> m_robotElevator.setToHeight()));
 
-    //Intake Controls (DEMO!)
+    // Intake Controls (DEMO!)
     m_operatorController.povUp().onTrue(Commands.runOnce(() -> m_robotIntake.RunArm(1)));
     m_operatorController.povUp().onFalse(Commands.runOnce(() -> m_robotIntake.RunArm(0)));
     m_operatorController.povDown().onTrue(Commands.runOnce(() -> m_robotIntake.RunArm(-1)));
@@ -122,12 +123,12 @@ public class RobotContainer {
     m_operatorController.leftTrigger().onFalse(Commands.runOnce(() -> m_robotIntake.RunIntake(0)));
 
     //Setpoint Controls
-    m_operatorStation.button(SetPointConstants.kBargeSetpointButton).onTrue(Commands.runOnce(() -> m_robotIntake.ArmToSetpoint(SetPointConstants.kArmBargeSetpoint)));
-    m_operatorStation.button(SetPointConstants.kProcessorSetpointButton).onTrue(Commands.runOnce(() -> m_robotIntake.ArmToSetpoint(SetPointConstants.kArmProcessorSetpoint)));
-    m_operatorStation.button(SetPointConstants.kL2SetpointButton).onTrue(Commands.runOnce(() -> m_robotIntake.ArmToSetpoint(SetPointConstants.kArmL2Setpoint)));
-    m_operatorStation.button(SetPointConstants.kL3SetpointButton).onTrue(Commands.runOnce(() -> m_robotIntake.ArmToSetpoint(SetPointConstants.kArmL3Setpoint)));
-    m_operatorStation.button(SetPointConstants.kAlgaeOnCoralSetpointButton).onTrue(Commands.runOnce(() -> m_robotIntake.ArmToSetpoint(SetPointConstants.kArmAlgaeOnCoralSetpoint)));
-    m_operatorStation.button(SetPointConstants.kAlgaeOnFloorSetpointButton).onTrue(Commands.runOnce(() -> m_robotIntake.ArmToSetpoint(SetPointConstants.kArmFloorSetpoint)));
+    // m_operatorStation.button(SetPointConstants.kBargeSetpointButton).onTrue(Commands.runOnce(() -> m_robotIntake.ArmToSetpoint(SetPointConstants.kArmBargeSetpoint)));
+    // m_operatorStation.button(SetPointConstants.kProcessorSetpointButton).onTrue(Commands.runOnce(() -> m_robotIntake.ArmToSetpoint(SetPointConstants.kArmProcessorSetpoint)));
+    // m_operatorStation.button(SetPointConstants.kL2SetpointButton).onTrue(Commands.runOnce(() -> m_robotIntake.ArmToSetpoint(SetPointConstants.kArmL2Setpoint)));
+    // m_operatorStation.button(SetPointConstants.kL3SetpointButton).onTrue(Commands.runOnce(() -> m_robotIntake.ArmToSetpoint(SetPointConstants.kArmL3Setpoint)));
+    // m_operatorStation.button(SetPointConstants.kAlgaeOnCoralSetpointButton).onTrue(Commands.runOnce(() -> m_robotIntake.ArmToSetpoint(SetPointConstants.kArmAlgaeOnCoralSetpoint)));
+    // m_operatorStation.button(SetPointConstants.kAlgaeOnFloorSetpointButton).onTrue(Commands.runOnce(() -> m_robotIntake.ArmToSetpoint(SetPointConstants.kArmFloorSetpoint)));
 
     //Barge Controls
   }

@@ -1,0 +1,63 @@
+{
+  "version": "2025.0",
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "parallel",
+          "data": {
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "TopAlgaePickup"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "SetToHeight"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "ArmToSetPoint"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "sequential",
+          "data": {
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "top to reef"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "ArmToSetPoint"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": null
+                }
+              }
+            ]
+          }
+        }
+      ]
+    }
+  },
+  "resetOdom": true,
+  "folder": null,
+  "choreoAuto": false
+}

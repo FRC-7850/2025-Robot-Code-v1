@@ -9,6 +9,7 @@ import com.revrobotics.spark.SparkLowLevel.MotorType;
 import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class IntakeSubsystem extends SubsystemBase{
@@ -34,10 +35,9 @@ public class IntakeSubsystem extends SubsystemBase{
           }
      }
 
-     public void RunIntake(double polarity){          
-        double speed = intakeMaxSpeed * polarity;
-        m_intakeMotorRight.set(polarity);
-        m_intakeMotorLeft.set(-polarity);
+     public Command RunIntake(double polarity){        
+          //Make intake motor left into an inverse follower in rev if this is going to set them both  
+          return this.runOnce(() ->  m_intakeMotorRight.set(polarity));
    }
      
      public void zeroArmEncoder(){
@@ -48,8 +48,8 @@ public class IntakeSubsystem extends SubsystemBase{
           return m_armMotorRight.getEncoder().getPosition();
      }
 
-     public void ArmToSetpoint(double setpoint){
-          m_armMotorRight.getClosedLoopController().setReference(setpoint + armEncoderOffset, SparkMax.ControlType.kPosition, ClosedLoopSlot.kSlot0);
+     public Command ArmToSetpoint(double setpoint){
+          return this.runOnce(() -> m_armMotorRight.getClosedLoopController().setReference(setpoint + armEncoderOffset, SparkMax.ControlType.kPosition, ClosedLoopSlot.kSlot0));
      }
 
      public IntakeSubsystem(){

@@ -4,6 +4,10 @@
 
 package frc.robot;
 
+import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.auto.NamedCommands;
+import com.pathplanner.lib.commands.PathPlannerAuto;
+import com.pathplanner.lib.path.PathPlannerPath;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
@@ -74,6 +78,11 @@ public class RobotContainer {
                 -MathUtil.applyDeadband(m_driverController.getRightX(), OIConstants.kDriveDeadband),
                 false),
             m_robotDrive));
+       
+   NamedCommands.registerCommand("SetToHeight", m_robotElevator.setToHeight());
+   NamedCommands.registerCommand("ArmToSetpoint",m_robotIntake.ArmToSetpoint(0.0));
+   NamedCommands.registerCommand("RunIntake",m_robotIntake.RunIntake(0));
+   configureButtonBindings();
   }
 
 
@@ -178,8 +187,6 @@ public class RobotContainer {
     // Run path following command, then stop at the end.
     return swerveControllerCommand.andThen(() -> m_robotDrive.drive(0, 0, 0, false));
   }
-
-
 
 
 }

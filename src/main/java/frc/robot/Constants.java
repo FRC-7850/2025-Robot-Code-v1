@@ -24,6 +24,41 @@ import edu.wpi.first.math.util.Units;
  * constants are needed, to reduce verbosity.
  */
 public final class Constants {
+  public static final class CanIDConstants{
+    //Drive
+      //Driving Motors
+      public static final int kFrontLeftDrivingCanId = 3;
+      public static final int kRearLeftDrivingCanId = 5;
+      public static final int kFrontRightDrivingCanId = 1;
+      public static final int kRearRightDrivingCanId = 7;
+      //Turning Motors
+      public static final int kFrontLeftTurningCanId = 4;
+      public static final int kRearLeftTurningCanId = 6;
+      public static final int kFrontRightTurningCanId = 2;
+      public static final int kRearRightTurningCanId = 8;
+      //Gyro
+      public static final int kGyroId = 9;
+
+    //Elevator
+    public static final int kElevatorLeftCanId = 20;
+    public static final int kElevatorRightCanId = 21;
+
+    //Intake Arm
+    public static final int kArmLeftCanId = 30;
+    public static final int kArmRightCanId = 31;
+
+    //Intake
+    public static final int kIntakeLeftCanId = 40;
+    public static final int kIntakeRightCanId = 41;
+
+    //Climb
+    public static final int kClimberCanId = 50; //unset in rev
+
+    //Coral
+    public static final int kCoralMotorTopCanId = 60;
+    public static final int kCoralMotorBottomCanId = 61;
+  }
+
   public static final class DriveConstants {
     // Driving Parameters - Note that these are not the maximum capable speeds of
     // the robot, rather the allowed maximum speeds
@@ -50,22 +85,7 @@ public final class Constants {
     public static final double kFrontRightChassisAngularOffset = 0;
     public static final double kBackLeftChassisAngularOffset = Math.PI;
     public static final double kBackRightChassisAngularOffset = Math.PI / 2;
-
-    // SPARK MAX CAN IDs
-    public static final int kFrontLeftDrivingCanId = 3;
-    public static final int kRearLeftDrivingCanId = 5;
-    public static final int kFrontRightDrivingCanId = 1;
-    public static final int kRearRightDrivingCanId = 7;
-
-    public static final int kFrontLeftTurningCanId = 4;
-    public static final int kRearLeftTurningCanId = 6;
-    public static final int kFrontRightTurningCanId = 2;
-    public static final int kRearRightTurningCanId = 8;
-
     public static final boolean kGyroReversed = false;
-
-    // GYRO CAN ID
-    public static final int kGyroId = 9;
   }
 
   public static final class ModuleConstants {
@@ -90,17 +110,9 @@ public final class Constants {
     public static final int kOperationsControllerPort = 1;
     public static final int kButtonPanelControllerPort = 2;
 
-    public static final double kDriveDeadband = 0.1;
-
-    //Elevator
-    public static final int kElevatorCanIDLeft = 20;
-    public static final int kElevatorCanIDRight = 21;
+    public static final double kDriveDeadband = 0.1;;
 
     //Arm/Intake (UNSET)
-    public static final int kArmCanIDLeft = 30;
-    public static final int kArmCanIDRight = 31;
-    public static final int kIntakeCanIDLeft = 40;
-    public static final int kIntakeCanIDRight = 41;
   }
 
   public static final class LEDConstants {
@@ -134,6 +146,12 @@ public final class Constants {
 
   public static final class NeoMotorConstants {
     public static final double kFreeSpeedRpm = 5676;
+
+    public static final double kElevatorTimeToInterpolate = 0.5;
+    public static final double kArmTimeToInterpolate = 0.5;
+    public static final double kClimberTimeToInterpolate = 0.5;
+
+    public static final double kClimberSpeed = 0.75;
   }
 
   public static final class TransformConstants{
@@ -153,6 +171,7 @@ public final class Constants {
     public static final double kElevatorMaxSpeed = .5;
     public static final double kS = 0, kG = 0, kV = 0, kA = 0, kP = 0, kI = 0, kD = 0;
     public static final double kElevatorMaxHeight = 120.0;
+
   }
 
   public static final class IntakeConstants{

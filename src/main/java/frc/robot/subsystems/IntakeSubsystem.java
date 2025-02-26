@@ -2,6 +2,7 @@ package frc.robot.subsystems;
 import com.revrobotics.spark.ClosedLoopSlot;
 import com.revrobotics.spark.SparkMax;
 
+import frc.robot.Constants.CanIDConstants;
 import frc.robot.Constants.IntakeConstants;
 import frc.robot.Constants.OIConstants;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
@@ -16,10 +17,10 @@ public class IntakeSubsystem extends SubsystemBase{
      GenericEntry encoderReadout;
 
     //Set followers and PID constants in Rev client, because following only right motors are used in code
-     private final SparkMax m_armMotorLeft = new SparkMax(OIConstants.kArmCanIDLeft, MotorType.kBrushed);
-     private final SparkMax m_armMotorRight = new SparkMax(OIConstants.kArmCanIDRight, MotorType.kBrushed);
-     private final SparkMax m_intakeMotorLeft = new SparkMax(OIConstants.kIntakeCanIDLeft, MotorType.kBrushless);
-     private final SparkMax m_intakeMotorRight = new SparkMax(OIConstants.kIntakeCanIDRight, MotorType.kBrushless);
+     private final SparkMax m_armMotorLeft = new SparkMax(CanIDConstants.kArmLeftCanId, MotorType.kBrushed);
+     private final SparkMax m_armMotorRight = new SparkMax(CanIDConstants.kArmRightCanId, MotorType.kBrushed);
+     private final SparkMax m_intakeMotorLeft = new SparkMax(CanIDConstants.kIntakeLeftCanId, MotorType.kBrushless);
+     private final SparkMax m_intakeMotorRight = new SparkMax(CanIDConstants.kIntakeRightCanId, MotorType.kBrushless);
 
      private double armEncoderOffset;
      private double intakeMaxSpeed = IntakeConstants.kIntakeSpeed;

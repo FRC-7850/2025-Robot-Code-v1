@@ -7,6 +7,7 @@ import com.revrobotics.spark.SparkBase;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.SparkBase.PersistMode;
 
+import frc.robot.Constants.CanIDConstants;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.ElevatorConstants;
 import frc.robot.Constants.OIConstants;
@@ -37,8 +38,8 @@ public class ElevatorSubsystem extends SubsystemBase{
      GenericEntry turns, turnRate, eleSpeed, eleSP;
 
 
-     private final SparkMax m_leftMotor = new SparkMax(OIConstants.kElevatorCanIDLeft, MotorType.kBrushless);
-     private final SparkMax m_rightMotor = new SparkMax(OIConstants.kElevatorCanIDRight, MotorType.kBrushless);
+     private final SparkMax m_leftMotor = new SparkMax(CanIDConstants.kElevatorLeftCanId, MotorType.kBrushless);
+     private final SparkMax m_rightMotor = new SparkMax(CanIDConstants.kElevatorRightCanId, MotorType.kBrushless);
      //private DiffPIDOutput_PIDOutputModeValue
      private double encoderOffset;
      private double eleSetSpeed = ElevatorConstants.kElevatorMaxSpeed;

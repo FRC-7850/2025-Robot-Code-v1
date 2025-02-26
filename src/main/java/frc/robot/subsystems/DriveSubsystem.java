@@ -16,6 +16,7 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.units.measure.Angle;
 import frc.robot.subsystems.PoseSubsystem;
+import frc.robot.Constants.CanIDConstants;
 import frc.robot.Constants.DriveConstants;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import com.ctre.phoenix6.*;
@@ -24,31 +25,31 @@ import com.ctre.phoenix6.hardware.*;
 public class DriveSubsystem extends SubsystemBase {
   // Create MAXSwerveModules
   private final MAXSwerveModule m_frontLeft = new MAXSwerveModule(
-      DriveConstants.kFrontLeftDrivingCanId,
-      DriveConstants.kFrontLeftTurningCanId,
-      DriveConstants.kFrontLeftChassisAngularOffset);
+   CanIDConstants.kFrontLeftDrivingCanId,
+   CanIDConstants.kFrontLeftTurningCanId,
+   DriveConstants.kFrontLeftChassisAngularOffset);
 
   private final MAXSwerveModule m_frontRight = new MAXSwerveModule(
-      DriveConstants.kFrontRightDrivingCanId,
-      DriveConstants.kFrontRightTurningCanId,
-      DriveConstants.kFrontRightChassisAngularOffset);
+    CanIDConstants.kFrontRightDrivingCanId,
+    CanIDConstants.kFrontRightTurningCanId,
+    DriveConstants.kFrontRightChassisAngularOffset);
 
   private final MAXSwerveModule m_rearLeft = new MAXSwerveModule(
-      DriveConstants.kRearLeftDrivingCanId,
-      DriveConstants.kRearLeftTurningCanId,
-      DriveConstants.kBackLeftChassisAngularOffset);
+    CanIDConstants.kRearLeftDrivingCanId,
+    CanIDConstants.kRearLeftTurningCanId,
+    DriveConstants.kBackLeftChassisAngularOffset);
 
   private final MAXSwerveModule m_rearRight = new MAXSwerveModule(
-      DriveConstants.kRearRightDrivingCanId,
-      DriveConstants.kRearRightTurningCanId,
-      DriveConstants.kBackRightChassisAngularOffset);
+    CanIDConstants.kRearRightDrivingCanId,
+    CanIDConstants.kRearRightTurningCanId,
+    DriveConstants.kBackRightChassisAngularOffset);
 
   // FeedForward pathing instructions
   PoseSubsystem m_robotPose = new PoseSubsystem();
   ChassisSpeeds robotPathSpeeds = m_robotPose.GetLTVControlOutput();
 
   // The gyro sensor
-  private final Pigeon2 m_gyro = new Pigeon2(DriveConstants.kGyroId);
+  private final Pigeon2 m_gyro = new Pigeon2(CanIDConstants.kGyroId);
   private StatusSignal<Angle> yaw = m_gyro.getYaw();
   
   // Odometry class for tracking robot pose

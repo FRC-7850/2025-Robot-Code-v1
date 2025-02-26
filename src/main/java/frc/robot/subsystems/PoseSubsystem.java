@@ -19,7 +19,7 @@ import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import frc.robot.Constants.TransformConstants;;
 
 public class PoseSubsystem extends SubsystemBase{
-    AprilTagFieldLayout aprilTagFieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.k2025Reefscape);
+    AprilTagFieldLayout aprilTagFieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.kDefaultField);
     LTVUnicycleController controller = new LTVUnicycleController(VecBuilder.fill(0.0625, 0.125, 2.0), VecBuilder.fill(1.0, 2.0), 0.02, 9);
     ChassisSpeeds LTVControlOutput; 
     ShuffleboardTab VisionTab = Shuffleboard.getTab("Vision Values");

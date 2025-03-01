@@ -34,6 +34,7 @@ public class LEDs extends SubsystemBase{
 
     Comparable<DriverStation.Alliance> allianceComparable = null;
     LEDPattern allOff = LEDPattern.solid(Color.kBlack);
+    LEDPattern allWhite = LEDPattern.solid(RGB2GRB(Color.kWhite));
     ElevatorSubsystem m_elevatorSubsystem;
     public LEDs(ElevatorSubsystem Elevator){
         
@@ -90,11 +91,14 @@ public class LEDs extends SubsystemBase{
     }
 
     public void setElevatorProgressLights(){
-        double elePer = m_elevatorSubsystem.getEleEncoder() /Constants.ElevatorConstants.kElevatorMaxHeight;
-        if(elePer < 0.01){
-            elePer = 0.01;
-        }
-        elevatorPattern = LEDPattern.steps(Map.of(0,RGB2GRB(Color.kWhite),elePer, RGB2GRB(Color.kRed)));
+  
+
+        LEDPattern basePattern = LEDPattern.solid(RGB2GRB(Color.kRed));
+        LEDPattern progressPattern = LEDPattern.progressMaskLayer(()-> (1-(m_elevatorSubsystem.getEleEncoder() /Constants.ElevatorConstants.kElevatorMaxHeight))).reversed();
+        //elevatorPattern = LEDPattern.solid(RGB2GRB(Color.kWhite)).progressMaskLayer(()-> m_elevatorSubsystem.getEleEncoder() /Constants.ElevatorConstants.kElevatorMaxHeight);
+        
+        elevatorPattern = progressPattern.overlayOn(basePattern);
+        //elevatorPattern = LEDPattern.steps(Map.of(0,RGB2GRB(Color.kWhite),elePer, RGB2GRB(Color.kRed)));
         elevatorPattern.applyTo(m_elevator);
         }
 

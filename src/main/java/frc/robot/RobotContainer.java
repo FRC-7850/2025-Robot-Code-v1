@@ -72,7 +72,7 @@ public class RobotContainer {
                 -MathUtil.applyDeadband(m_driverController.getLeftY(), OIConstants.kDriveDeadband),
                 -MathUtil.applyDeadband(m_driverController.getLeftX(), OIConstants.kDriveDeadband),
                 -MathUtil.applyDeadband(m_driverController.getRightX(), OIConstants.kDriveDeadband),
-                false),
+                true),
             m_robotDrive));
   }
 
@@ -118,6 +118,7 @@ public class RobotContainer {
     m_operatorController.povDown().onTrue(Commands.runOnce(() -> m_robotIntake.RunArm(-1)));
     m_operatorController.povDown().onFalse(Commands.runOnce(() -> m_robotIntake.RunArm(0)));
     m_operatorController.leftBumper().onTrue(Commands.runOnce(() -> m_robotIntake.RunIntake(1)));
+    //m_operatorController.rightBumper().onTrue(Commands.runOnce(() ->, null));
     m_operatorController.leftBumper().onFalse(Commands.runOnce(() -> m_robotIntake.RunIntake(0)));
     m_operatorController.leftTrigger().onTrue(Commands.runOnce(() -> m_robotIntake.RunIntake(-1)));
     m_operatorController.leftTrigger().onFalse(Commands.runOnce(() -> m_robotIntake.RunIntake(0)));

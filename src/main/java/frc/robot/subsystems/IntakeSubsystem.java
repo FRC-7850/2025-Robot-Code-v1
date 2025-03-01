@@ -1,4 +1,6 @@
 package frc.robot.subsystems;
+import java.time.Instant;
+
 import com.revrobotics.spark.ClosedLoopSlot;
 import com.revrobotics.spark.SparkMax;
 
@@ -9,6 +11,8 @@ import com.revrobotics.spark.SparkLowLevel.MotorType;
 import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
+import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class IntakeSubsystem extends SubsystemBase{
@@ -28,9 +32,9 @@ public class IntakeSubsystem extends SubsystemBase{
      public void RunArm(double polarity){          
           double speed = armMaxSpeed * polarity;
           if (speed > 0){
-               m_armMotorLeft.set(polarity * 0.8);
+               m_armMotorLeft.set(polarity);
           }else{
-               m_armMotorLeft.set(polarity * 0.1);
+               m_armMotorLeft.set(polarity);
           }
      }
 
@@ -39,6 +43,12 @@ public class IntakeSubsystem extends SubsystemBase{
         m_intakeMotorRight.set(polarity);
         m_intakeMotorLeft.set(-polarity);
    }
+
+   /*public void RunInta(double polarity){          
+     new InstantCommand(() -> m_intakeMotorLeft.set(polarity))
+     .alongWith(new InstantCommand(() -> m_intakeMotorRight.set(-polarity)))
+     .withDeadline(null)
+     }*/
      
      public void zeroArmEncoder(){
           armEncoderOffset = m_armMotorRight.getEncoder().getPosition();

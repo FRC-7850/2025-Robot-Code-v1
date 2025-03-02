@@ -10,6 +10,7 @@ import edu.wpi.first.math.controller.ElevatorFeedforward;
 //Rev
 import com.revrobotics.spark.ClosedLoopSlot;
 import com.revrobotics.spark.SparkClosedLoopController;
+import com.revrobotics.spark.SparkLimitSwitch;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkFlexConfig;
 
@@ -29,6 +30,8 @@ public class ElevatorSubsystem extends SubsystemBase{
      private final SparkMax m_rightMotor = new SparkMax(CanIDConstants.kElevatorRightCanId, MotorType.kBrushless);
      SparkClosedLoopController elevatorController = m_rightMotor.getClosedLoopController();
      SparkFlexConfig config = new SparkFlexConfig();
+     SparkLimitSwitch topSwitch = m_rightMotor.getForwardLimitSwitch();
+     SparkLimitSwitch bottomSwitch = m_rightMotor.getReverseLimitSwitch();
      private double encoderOffset;
      private double eleSetSpeed = ElevatorConstants.kElevatorMaxSpeed;
      private ElevatorFeedforward elevatorFeedForward = new ElevatorFeedforward(
@@ -37,7 +40,7 @@ public class ElevatorSubsystem extends SubsystemBase{
           ElevatorConstants.kV, 
           ElevatorConstants.kA
      );
-     int elevatorSetpoint;
+     double elevatorSetpoint;
 
      //Subsystem Method
      public ElevatorSubsystem(){
@@ -62,8 +65,9 @@ public class ElevatorSubsystem extends SubsystemBase{
      }
      
      public void ElevatorFineTune(double input){
-          double speed = eleSetSpeed * input;
-               m_leftMotor.set(speed);
+          if((!topSwitch.isPressed() && input > 1) && (!bottomSwitch.isPressed() && input < 1)){
+               elevatorSetpoint = elevatorSetpoint + input;
+          }
      }
 
      public void setToHeight(double setpoint){
@@ -84,6 +88,6 @@ public class ElevatorSubsystem extends SubsystemBase{
          .d(3);   
 
          //Run PID
-         elevatorController.setReference(setpoint+encoderOffset, SparkMax.ControlType.kPosition, ClosedLoopSlot.kSlot0, elevatorFeedForward.calculate(0));
+         elevatorController.setReference(elevatorSetpoint+encoderOffset, SparkMax.ControlType.kPosition, ClosedLoopSlot.kSlot0, elevatorFeedForward.calculate(0));
      }
 }

@@ -50,17 +50,17 @@ public class RobotContainer {
   // Manual vs. Pathing controls
   public boolean pathingSwitch = false;
 
-  // The robot's subsystems
-  private final DriveSubsystem m_robotDrive = new DriveSubsystem();
-  private final ElevatorSubsystem m_robotElevator = new ElevatorSubsystem();
-  private final IntakeSubsystem m_robotIntake = new IntakeSubsystem();
-  private final LEDs m_leds = new LEDs(m_robotElevator);
-  private final CommandController m_commandController = new CommandController();
+  // The robot's subsystems  private final ElevatorSubsystem robotElevator = new ElevatorSubsystem();
+  private final DriveSubsystem robotDrive = new DriveSubsystem();
+  private final ElevatorSubsystem robotElevator = new ElevatorSubsystem();
+  private final IntakeSubsystem robotIntake = new IntakeSubsystem();
+  private final LEDs leds = new LEDs(robotElevator);
+  private final CommandController commandController = new CommandController();
 
   // The robot controllers
-  XboxController m_driverController = new XboxController(OIConstants.kDriverControllerPort);
-  CommandXboxController m_operatorController = new CommandXboxController(OIConstants.kOperationsControllerPort);
-//   CommandJoystick m_operatorStation = new CommandJoystick(OIConstants.kButtonPanelControllerPort);
+  XboxController driverController = new XboxController(OIConstants.kDriverControllerPort);
+  CommandXboxController operatorController = new CommandXboxController(OIConstants.kOperationsControllerPort);
+//   CommandJoystick operatorStation = new CommandJoystick(OIConstants.kButtonPanelControllerPort);
 
   //Joystick Slew Rate Limiter
   SlewRateLimiter operatorFilter = new SlewRateLimiter(TransformConstants.kOperatorSlewRate);
@@ -73,17 +73,17 @@ public class RobotContainer {
     configureButtonBindings();
     
     // Configure default commands
-    m_robotDrive.setDefaultCommand(
+    robotDrive.setDefaultCommand(
         // The left stick controls translation of the robot.
         // Turning is controlled by the X axis of the right stick.
         new RunCommand(
-            () -> m_robotDrive.drive(
-                -MathUtil.applyDeadband(m_driverController.getLeftY(), OIConstants.kDriveDeadband),
-                -MathUtil.applyDeadband(m_driverController.getLeftX(), OIConstants.kDriveDeadband),
-                -MathUtil.applyDeadband(m_driverController.getRightX(), OIConstants.kDriveDeadband),
+            () -> robotDrive.drive(
+                -MathUtil.applyDeadband(driverController.getLeftY(), OIConstants.kDriveDeadband),
+                -MathUtil.applyDeadband(driverController.getLeftX(), OIConstants.kDriveDeadband),
+                -MathUtil.applyDeadband(driverController.getRightX(), OIConstants.kDriveDeadband),
                 pathingSwitch,
                 false),
-            m_robotDrive));
+            robotDrive));
   }
 
   /*Robot Button Mappings:
@@ -113,30 +113,33 @@ public class RobotContainer {
     */
   private void configureButtonBindings() {
     //Drive Controls
-    new JoystickButton(m_driverController, Button.kR1.value)
+    new JoystickButton(driverController, Button.kR1.value)
         .whileTrue(new RunCommand(
-            () -> m_robotDrive.setX(),
-            m_robotDrive));
+            () -> robotDrive.setX(),
+            robotDrive));
 
     //Elevator Controls
       //Fine tune
-      m_operatorController.axisMagnitudeGreaterThan(1, 0.1).whileTrue(Commands.run(() -> CommandController.ElevatorFineTune(operatorFilter.calculate(-m_operatorController.getLeftY()))));
-      m_operatorController.axisMagnitudeGreaterThan(1, 0.1).whileFalse(Commands.run(() -> CommandController.ElevatorFineTune(0)));
+      operatorController.axisMagnitudeGreaterThan(1, 0.1).whileTrue(commandController.ElevatorFineTune(operatorFilter.calculate(-operatorController.getLeftY())));
+      operatorController.axisMagnitudeGreaterThan(1, 0.1).whileFalse(commandController.ElevatorFineTune(0));
 
     // Intake Controls (DEMO!)
       //Arm
         //Fine tune
         //TODO: which axis is the arm axis?
-        m_operatorController.axisMagnitudeGreaterThan(4, 0.1).whileTrue(Commands.run(() -> CommandController.ElevatorFineTune(operatorFilter.calculate(-m_operatorController.getLeftY()))));
-        m_operatorController.axisMagnitudeGreaterThan(4, 0.1).whileFalse(Commands.run(() -> CommandController.ElevatorFineTune(0)));
+        operatorController.axisMagnitudeGreaterThan(4, 0.1).whileTrue(commandController.ElevatorFineTune(operatorFilter.calculate(-operatorController.getLeftY())));
+        operatorController.axisMagnitudeGreaterThan(4, 0.1).whileFalse(commandController.ElevatorFineTune(0));
       //Intake
-        m_operatorController.leftBumper().onTrue(CommandController.Intake(1));
-        m_operatorController.leftBumper().onFalse(CommandController.Intake(0));
+        operatorController.leftBumper().onTrue(commandController.Intake(1));
+        operatorController.leftBumper().onFalse(commandController.Intake(0));
 
-      //Manual Setpoint Controls
-      m_operatorController.povUp().onTrue(CommandController)
+    //Setpoint Controls
 
+    //Pathing Controls
+     
     //Barge Controls
+    driverController.povUp().whileTrue(commandController.Barge(1));
+    driverController.povDown().whileTrue(commandController.Barge(-1));
   }
 
   /**
@@ -168,21 +171,21 @@ public class RobotContainer {
 
     SwerveControllerCommand swerveControllerCommand = new SwerveControllerCommand(
         exampleTrajectory,
-        m_robotDrive::getPose, // Functional interface to feed supplier
+        robotDrive::getPose, // Functional interface to feed supplier
         DriveConstants.kDriveKinematics,
 
         // Position controllers
         new PIDController(AutoConstants.kPXController, 0, 0),
         new PIDController(AutoConstants.kPYController, 0, 0),
         thetaController,
-        m_robotDrive::setModuleStates,
-        m_robotDrive);
+        robotDrive::setModuleStates,
+        robotDrive);
 
     // Reset odometry to the starting pose of the trajectory.
-    m_robotDrive.resetOdometry(exampleTrajectory.getInitialPose());
+    robotDrive.resetOdometry(exampleTrajectory.getInitialPose());
 
     // Run path following command, then stop at the end.
-    return swerveControllerCommand.andThen(() -> m_robotDrive.drive(0, 0, 0, pathingSwitch, false));
+    return swerveControllerCommand.andThen(() -> robotDrive.drive(0, 0, 0, pathingSwitch, false));
   }
 
 

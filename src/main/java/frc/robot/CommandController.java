@@ -62,12 +62,12 @@ import edu.wpi.first.wpilibj2.command.RunCommand;
         return new InstantCommand(() -> elevatorSubsystem.setToHeight(eleSetpoints[setpointSelected])).alongWith(IntakeSubsystem.setToHeight(eleSetpoints[setpointSelected]));
     }
 
-    public Command ElevatorFineTune(){
-        return Commands.run(elevatorSubsystem.ElevatorFineTune(), elevatorSubsystem);
+    public Command ElevatorFineTune(double input){
+        return Commands.run(elevatorSubsystem.ElevatorFineTune(input), elevatorSubsystem);
     }
 
-    public Command ArmFineTune(){
-        return Commands.run(null, null)
+    public Command ArmFineTune(double input){
+        return Commands.run(null, null);
     }
 
     public Command Intake(){
@@ -83,9 +83,10 @@ import edu.wpi.first.wpilibj2.command.RunCommand;
         return new InstantCommand(() -> ClimbSubsystem.StopClimb());
     }
 
-    public void BrowseSetpointList(int i){
-        setpointSelected = (setpointSelected == 4) ? 0 : setpointSelected + i;
-    }
+    //Old idea for setpoint selection
+    // public void BrowseSetpointList(int i){
+    //     setpointSelected = (setpointSelected == 4) ? 0 : setpointSelected + i;
+    // }
 
     //Coral Integration?
     // public Command CoralIntake(){

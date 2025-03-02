@@ -22,6 +22,7 @@ import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.OIConstants;
 import frc.robot.Constants.SetPointConstants;
+import frc.robot.subsystems.ClimbSubsystem;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.ElevatorSubsystem;
 import frc.robot.subsystems.IntakeSubsystem;
@@ -49,6 +50,7 @@ public class RobotContainer {
   private final DriveSubsystem m_robotDrive = new DriveSubsystem();
   private final ElevatorSubsystem m_robotElevator = new ElevatorSubsystem();
   private final IntakeSubsystem m_robotIntake = new IntakeSubsystem();
+  private final ClimbSubsystem m_robotClimber = new ClimbSubsystem();
   private final LEDs m_leds = new LEDs(m_robotElevator);
 
   // The robot controllers
@@ -133,6 +135,11 @@ public class RobotContainer {
     // m_operatorStation.button(SetPointConstants.kAlgaeOnFloorSetpointButton).onTrue(Commands.runOnce(() -> m_robotIntake.ArmToSetpoint(SetPointConstants.kArmFloorSetpoint)));
 
     //Barge Controls
+    m_operatorController.rightTrigger().onTrue(Commands.runOnce(() -> m_robotClimber.Climb(1)));
+    m_operatorController.rightTrigger().onFalse(Commands.runOnce(() -> m_robotClimber.Climb(0)));
+    m_operatorController.leftTrigger().onTrue(Commands.runOnce(() -> m_robotClimber.Climb(-1)));
+    m_operatorController.leftTrigger().onFalse(Commands.runOnce(() -> m_robotClimber.Climb(0)));
+
   }
 
   /**

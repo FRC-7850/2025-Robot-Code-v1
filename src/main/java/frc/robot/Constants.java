@@ -100,6 +100,9 @@ public final class Constants {
     public static final int kArmCanIDRight = 31;
     public static final int kIntakeCanIDLeft = 40;
     public static final int kIntakeCanIDRight = 41;
+
+    //Climber
+    public static final int kClimberCanId = 50;
   }
 
   public static final class LEDConstants {

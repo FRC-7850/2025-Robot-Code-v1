@@ -4,75 +4,70 @@
 
 package frc.robot;
 
+//Java
+import java.util.List;
+
+//WPILib
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.filter.SlewRateLimiter;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.trajectory.Trajectory;
-import edu.wpi.first.math.trajectory.TrajectoryConfig;
-import edu.wpi.first.math.trajectory.TrajectoryGenerator;
-import edu.wpi.first.util.concurrent.Event;
+import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.wpilibj.XboxController;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
-import edu.wpi.first.wpilibj.PS4Controller.Button;
+import edu.wpi.first.wpilibj.DriverStation.Alliance; //TODO What's this for?
+import edu.wpi.first.wpilibj.PS4Controller.Button; //Used for the drive command, though i think that's fucking stupid
 import edu.wpi.first.wpilibj.event.EventLoop;
-import frc.robot.Constants.AutoConstants;
-import frc.robot.Constants.DriveConstants;
-import frc.robot.Constants.OIConstants;
-import frc.robot.Constants.SetPointConstants;
-import frc.robot.Constants.TransformConstants;
-import frc.robot.subsystems.DriveSubsystem;
-import frc.robot.subsystems.ElevatorSubsystem;
-import frc.robot.subsystems.IntakeSubsystem;
+import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SwerveControllerCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.POVButton;
-import java.util.List;
+
+//PathPlanner
+import com.pathplanner.lib.commands.PathPlannerAuto;
+
+  //File Structure
+//Constants
+import frc.robot.Constants.AutoConstants;
+import frc.robot.Constants.DriveConstants;
+import frc.robot.Constants.OIConstants;
+import frc.robot.Constants.SetPointConstants;
+import frc.robot.Constants.TransformConstants;
+//Subsystems
+import frc.robot.subsystems.DriveSubsystem;
+import frc.robot.subsystems.ElevatorSubsystem;
+import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.LEDs;
 
-//import edu.wpi.first.wpilibj2.command.button.PS4Controller;
-//import edu.wpi.first.wpilibj.PS4Controller;
-/*
- * This class is where the bulk of the robot should be declared.  Since Command-based is a
- * "declarative" paradigm, very little robot logic should actually be handled in the {@link Robot}
- * periodic methods (other than the scheduler calls).  Instead, the structure of the robot
- * (including subsystems, commands, and button mappings) should be declared here.
- */
 public class RobotContainer {
-  // Manual vs. Pathing controls
+  //Shuffleboard Entries
+  ShuffleboardTab auto = Shuffleboard.getTab("Autonomous");
+  GenericEntry selectAuto;
+
+    //Definitions
+  //Subsystems
+  private final DriveSubsystem robotDrive = new DriveSubsystem();
+  private final CommandController commandController = new CommandController();
+  //Controllers
+  XboxController driverController = new XboxController(OIConstants.kDriverControllerPort);
+  CommandXboxController operatorController = new CommandXboxController(OIConstants.kOperationsControllerPort); 
+  CommandJoystick operatorStation = new CommandJoystick(OIConstants.kButtonPanelControllerPort);
+  //Misc
+  SlewRateLimiter operatorFilter = new SlewRateLimiter(TransformConstants.kOperatorSlewRate);
   public boolean pathingSwitch = false;
 
-  // The robot's subsystems  private final ElevatorSubsystem robotElevator = new ElevatorSubsystem();
-  private final DriveSubsystem robotDrive = new DriveSubsystem();
-  private final ElevatorSubsystem robotElevator = new ElevatorSubsystem();
-  private final IntakeSubsystem robotIntake = new IntakeSubsystem();
-  private final LEDs leds = new LEDs(robotElevator);
-  private final CommandController commandController = new CommandController();
-
-  // The robot controllers
-  XboxController driverController = new XboxController(OIConstants.kDriverControllerPort);
-  CommandXboxController operatorController = new CommandXboxController(OIConstants.kOperationsControllerPort);
-//   CommandJoystick operatorStation = new CommandJoystick(OIConstants.kButtonPanelControllerPort);
-
-  //Joystick Slew Rate Limiter
-  SlewRateLimiter operatorFilter = new SlewRateLimiter(TransformConstants.kOperatorSlewRate);
-
-  /**
-   * The container for the robot. Contains subsystems, OI devices, and commands.
-   */
+  //File Method
   public RobotContainer() {
-    // Configure the button bindings
+    //Shuffleboard Entry Creation
+    selectAuto = auto.add("Autonomous Selected", 0).withWidget(BuiltInWidgets.kComboBoxChooser).getEntry();
+
+    //Initialize
     configureButtonBindings();
-    
-    // Configure default commands
     robotDrive.setDefaultCommand(
         // The left stick controls translation of the robot.
         // Turning is controlled by the X axis of the right stick.
@@ -110,7 +105,7 @@ public class RobotContainer {
     * Button 5:
     * Button 6:
     * Button 7:
-    */
+   */
   private void configureButtonBindings() {
     //Drive Controls
     new JoystickButton(driverController, Button.kR1.value)
@@ -123,10 +118,10 @@ public class RobotContainer {
       operatorController.axisMagnitudeGreaterThan(1, 0.1).whileTrue(commandController.ElevatorFineTune(operatorFilter.calculate(-operatorController.getLeftY())));
       operatorController.axisMagnitudeGreaterThan(1, 0.1).whileFalse(commandController.ElevatorFineTune(0));
 
-    // Intake Controls (DEMO!)
+    // Intake Controls
       //Arm
         //Fine tune
-        //TODO: which axis is the arm axis?
+        //TODO which axis is the arm axis?
         operatorController.axisMagnitudeGreaterThan(4, 0.1).whileTrue(commandController.ElevatorFineTune(operatorFilter.calculate(-operatorController.getLeftY())));
         operatorController.axisMagnitudeGreaterThan(4, 0.1).whileFalse(commandController.ElevatorFineTune(0));
       //Intake
@@ -142,53 +137,9 @@ public class RobotContainer {
     driverController.povDown().whileTrue(commandController.Barge(-1));
   }
 
-  /**
-   * Use this to pass the autonomous command to the main {@link Robot} class.
-   *
-   * @return the command to run in autonomous
-   */
   public Command getAutonomousCommand() {
-    // Create config for trajectory
-    TrajectoryConfig config = new TrajectoryConfig(
-        AutoConstants.kMaxSpeedMetersPerSecond,
-        AutoConstants.kMaxAccelerationMetersPerSecondSquared)
-        // Add kinematics to ensure max speed is actually obeyed
-        .setKinematics(DriveConstants.kDriveKinematics);
+    // return new InstantCommand(null);
 
-    // An example trajectory to follow. All units in meters.
-    Trajectory exampleTrajectory = TrajectoryGenerator.generateTrajectory(
-        // Start at the origin facing the +X direction
-        new Pose2d(0, 0, new Rotation2d(0)),
-        // Pass through these two interior waypoints, making an 's' curve path
-        List.of(new Translation2d(1, 1), new Translation2d(2, -1)),
-        // End 3 meters straight ahead of where we started, facing forward
-        new Pose2d(3, 0, new Rotation2d(0)),
-        config);
-
-    var thetaController = new ProfiledPIDController(
-        AutoConstants.kPThetaController, 0, 0, AutoConstants.kThetaControllerConstraints);
-    thetaController.enableContinuousInput(-Math.PI, Math.PI);
-
-    SwerveControllerCommand swerveControllerCommand = new SwerveControllerCommand(
-        exampleTrajectory,
-        robotDrive::getPose, // Functional interface to feed supplier
-        DriveConstants.kDriveKinematics,
-
-        // Position controllers
-        new PIDController(AutoConstants.kPXController, 0, 0),
-        new PIDController(AutoConstants.kPYController, 0, 0),
-        thetaController,
-        robotDrive::setModuleStates,
-        robotDrive);
-
-    // Reset odometry to the starting pose of the trajectory.
-    robotDrive.resetOdometry(exampleTrajectory.getInitialPose());
-
-    // Run path following command, then stop at the end.
-    return swerveControllerCommand.andThen(() -> robotDrive.drive(0, 0, 0, pathingSwitch, false));
+    return new PathPlannerAuto("TestingShooterAuto");
   }
-
-
-
-
 }

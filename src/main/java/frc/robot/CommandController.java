@@ -5,13 +5,11 @@
 
  package frc.robot;
 
- import java.security.Policy;
-
 //WPILib
  import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.RunCommand;
+ import edu.wpi.first.wpilibj2.command.Commands;
+ import edu.wpi.first.wpilibj2.command.InstantCommand;
+ import edu.wpi.first.wpilibj2.command.RunCommand;
  import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
     //File structure
@@ -26,6 +24,7 @@ import edu.wpi.first.wpilibj2.command.RunCommand;
 
  public class CommandController extends SubsystemBase{
     //Definitions
+    IntakeSubsystem intakeSubsystem = new IntakeSubsystem();
     ElevatorSubsystem elevatorSubsystem = new ElevatorSubsystem();
     PoseSubsystem poseSubsystem = new PoseSubsystem();
     ClimbSubsystem climbSubsystem = new ClimbSubsystem();
@@ -63,16 +62,18 @@ import edu.wpi.first.wpilibj2.command.RunCommand;
     }
 
     public Command ElevatorFineTune(double input){
-        return Commands.run(elevatorSubsystem.ElevatorFineTune(input), elevatorSubsystem);
+        return new RunCommand(() -> elevatorSubsystem.ElevatorFineTune(input),elevatorSubsystem);
     }
 
     public Command ArmFineTune(double input){
-        return Commands.run(null, null);
-    }
+        return new RunCommand(() -> intakeSubsystem.ArmFineTune(input),elevatorSubsystem);    }
 
-    public Command Intake(){
-        //Serves as both an intake and shoot command
-        return this.runOnce(() -> IntakeSubsystem.Intake());
+    public Command Intake(boolean toggle){
+        return this.runOnce(() -> IntakeSubsystem.Intake(toggle));
+    }
+    
+    public Command Shoot(booelan toggle){
+        return this.runOnce(() -> IntakeSubsystem.Shoot(toggle));
     }
 
     public Command Climb(double polarity){

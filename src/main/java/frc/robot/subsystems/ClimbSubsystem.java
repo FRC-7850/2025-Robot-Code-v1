@@ -48,6 +48,5 @@ public class ClimbSubsystem extends SubsystemBase{
         if(motorEncoder.getPosition() >= motorZeroPos && outputSetpoint > 1){
             climbMotor.set(MotorRampUp.RampUp(NeoMotorConstants.kClimberTimeToInterpolate, timeOrigin, outputSetpoint));
         }
-
     }
 }

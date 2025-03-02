@@ -6,6 +6,7 @@ import com.revrobotics.spark.ClosedLoopSlot;
 import com.revrobotics.spark.SparkBase;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.SparkBase.PersistMode;
+import com.revrobotics.spark.SparkLimitSwitch;
 
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.ElevatorConstants;
@@ -42,6 +43,8 @@ public class ElevatorSubsystem extends SubsystemBase{
      //private DiffPIDOutput_PIDOutputModeValue
      private double encoderOffset;
      private double eleSetSpeed = ElevatorConstants.kElevatorMaxSpeed;
+     SparkLimitSwitch topSwitch = m_rightMotor.getForwardLimitSwitch();
+     SparkLimitSwitch bottomSwitch = m_rightMotor.getReverseLimitSwitch();
 
      private ElevatorFeedforward elevatorFeedForward = new ElevatorFeedforward(ElevatorConstants.kS, ElevatorConstants.kG, 
                          ElevatorConstants.kV, ElevatorConstants.kA);
@@ -59,8 +62,10 @@ public class ElevatorSubsystem extends SubsystemBase{
      }
      
      public void RunElevator(double polarity){
-          double speed = eleSetSpeed * polarity;
-               m_leftMotor.set(speed);
+          if((!topSwitch.isPressed() && polarity > 1) && (!bottomSwitch.isPressed() && polarity < 1)){
+               double speed = eleSetSpeed * polarity;
+               m_rightMotor.set(speed);;
+          }
      }
 
      public ElevatorSubsystem(){
@@ -84,8 +89,5 @@ public class ElevatorSubsystem extends SubsystemBase{
          turns.setDouble(getEleEncoder());
          turnRate.setDouble(m_rightMotor.getEncoder().getVelocity());
          eleSetSpeed = eleSpeed.get().getDouble();
-
-         //super.periodic();
      }
-
 }

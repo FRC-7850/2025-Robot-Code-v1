@@ -155,6 +155,10 @@ public final class Constants {
   }
 
   public static final class TransformConstants{
+    //Slew Rate Limit
+    public static final double kOperatorSlewRate = 0.5;
+
+    //Vision
     public static final double kCameraToRobotOffsetX = .1; //Axis through front
     public static final double kCameraToRobotOffsetY = .1; //Axis through sides
     public static final double kCameraToRobotOffsetZ = .1; //Vertical axis, will not be constant.
@@ -171,7 +175,8 @@ public final class Constants {
     public static final double kElevatorMaxSpeed = .5;
     public static final double kS = 0, kG = 0, kV = 0, kA = 0, kP = 0, kI = 0, kD = 0;
     public static final double kElevatorMaxHeight = 120.0;
-
+    public static final double kElevatorMinOutput = 1;
+    public static final double kElevatorMaxOutput = 1;
   }
 
   public static final class IntakeConstants{

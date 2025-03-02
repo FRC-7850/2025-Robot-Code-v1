@@ -7,6 +7,7 @@ package frc.robot;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
+import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -22,6 +23,7 @@ import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.OIConstants;
 import frc.robot.Constants.SetPointConstants;
+import frc.robot.Constants.TransformConstants;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.ElevatorSubsystem;
 import frc.robot.subsystems.IntakeSubsystem;
@@ -53,11 +55,15 @@ public class RobotContainer {
   private final ElevatorSubsystem m_robotElevator = new ElevatorSubsystem();
   private final IntakeSubsystem m_robotIntake = new IntakeSubsystem();
   private final LEDs m_leds = new LEDs(m_robotElevator);
+  private final CommandController m_commandController = new CommandController();
 
   // The robot controllers
   XboxController m_driverController = new XboxController(OIConstants.kDriverControllerPort);
   CommandXboxController m_operatorController = new CommandXboxController(OIConstants.kOperationsControllerPort);
 //   CommandJoystick m_operatorStation = new CommandJoystick(OIConstants.kButtonPanelControllerPort);
+
+  //Joystick Slew Rate Limiter
+  SlewRateLimiter operatorFilter = new SlewRateLimiter(TransformConstants.kOperatorSlewRate);
 
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -80,59 +86,55 @@ public class RobotContainer {
             m_robotDrive));
   }
 
-
-
-  /**
-   * Use this method to define your button->command mappings. Buttons can be
-   * created by
-   * instantiating a {@link edu.wpi.first.wpilibj.GenericHID} or one of its
-   * subclasses ({@link
-   * edu.wpi.first.wpilibj.Joystick} or {@link XboxController}), and then calling
-   * passing it to a
-   * {@link JoystickButton}.
-   */
+  /*Robot Button Mappings:
+   * 🎮Drive Controller:
+    * Left Joystick: Strafe
+    * Right Joystick: Rotate
+    * X: Wheel lock
+    * Y: Barge Toggle
+    * B: Hazard Lights
+    * A: Reset Heading
+    * Dpad up: Climber up
+    * Dpad down: Climber down
+   * 🎮Operator Controller:
+    * Left Trigger: Shoot
+    * Left Bumper: Intake
+    * Left Joystick: Elevator Fine-tune
+    * Dpad up: Arm Fine-tune up
+    * Dpad down: Arm Fine-tune up
+   * 🎮Custom Pad:
+    * Button 1:
+    * Button 2:
+    * Button 3:
+    * Button 4:
+    * Button 5:
+    * Button 6:
+    * Button 7:
+    */
   private void configureButtonBindings() {
-    //Drive Command
+    //Drive Controls
     new JoystickButton(m_driverController, Button.kR1.value)
         .whileTrue(new RunCommand(
             () -> m_robotDrive.setX(),
             m_robotDrive));
 
-            m_operatorController.y().onTrue(Commands.runOnce(
-                () -> m_robotElevator.zeroEleEncoder(),m_robotElevator));
-
     //Elevator Controls
-    // m_operatorController.povDown().onTrue(Commands.runOnce(() -> m_robotElevator.RunElevator(-1)));
-    // m_operatorController.povUp().onTrue(Commands.runOnce(() -> m_robotElevator.RunElevator(1)));
-    // m_operatorController.povDown().onFalse(Commands.runOnce(() -> m_robotElevator.RunElevator(0)));
-    // m_operatorController.povUp().onFalse(Commands.runOnce(() -> m_robotElevator.RunElevator(0)));
-    // m_operatorController.axisGreaterThan(1, 0.1).onTrue(Commands.runOnce(() -> m_robotElevator.RunElevator(-1)));
-    // m_operatorController.axisLessTHan(1, 0.1).onTrue(Commands.runOnce(() -> m_robotElevator.RunElevator(-1)));
-    m_operatorController.axisMagnitudeGreaterThan(1, 0.1).whileTrue(Commands.run(() -> m_robotElevator.RunElevator(-m_operatorController.getLeftY())));
-    m_operatorController.axisMagnitudeGreaterThan(1, 0.1).onTrue(Commands.runOnce(() -> m_robotElevator.RunElevator(0)));
-    // m_operatorController.axisMagnitudeGreaterThan(1, 0.1).whileTrue(Commands.run(() -> m_robotElevator.RunElevator(m_operatorController.getLeftY())));
-    // m_operatorController.axisMagnitudeGreaterThan(1, 0.1).onFalse(Commands.runOnce(() -> m_robotElevator.RunElevator(0)));
-    m_operatorController.x().onTrue(Commands.runOnce(() -> m_robotElevator.RunElevator(0)));
-    //Disabled for Week Zero
-    // m_operatorController.a().onTrue(Commands.runOnce(() -> m_robotElevator.setToHeight()));
+      //Fine tune
+      m_operatorController.axisMagnitudeGreaterThan(1, 0.1).whileTrue(Commands.run(() -> CommandController.ElevatorFineTune(operatorFilter.calculate(-m_operatorController.getLeftY()))));
+      m_operatorController.axisMagnitudeGreaterThan(1, 0.1).whileFalse(Commands.run(() -> CommandController.ElevatorFineTune(0)));
 
     // Intake Controls (DEMO!)
-    m_operatorController.povUp().onTrue(Commands.runOnce(() -> m_robotIntake.RunArm(1)));
-    m_operatorController.povUp().onFalse(Commands.runOnce(() -> m_robotIntake.RunArm(0)));
-    m_operatorController.povDown().onTrue(Commands.runOnce(() -> m_robotIntake.RunArm(-1)));
-    m_operatorController.povDown().onFalse(Commands.runOnce(() -> m_robotIntake.RunArm(0)));
-    m_operatorController.leftBumper().onTrue(Commands.runOnce(() -> m_robotIntake.RunIntake(1)));
-    m_operatorController.leftBumper().onFalse(Commands.runOnce(() -> m_robotIntake.RunIntake(0)));
-    m_operatorController.leftTrigger().onTrue(Commands.runOnce(() -> m_robotIntake.RunIntake(-1)));
-    m_operatorController.leftTrigger().onFalse(Commands.runOnce(() -> m_robotIntake.RunIntake(0)));
+      //Arm
+        //Fine tune
+        //TODO: which axis is the arm axis?
+        m_operatorController.axisMagnitudeGreaterThan(4, 0.1).whileTrue(Commands.run(() -> CommandController.ElevatorFineTune(operatorFilter.calculate(-m_operatorController.getLeftY()))));
+        m_operatorController.axisMagnitudeGreaterThan(4, 0.1).whileFalse(Commands.run(() -> CommandController.ElevatorFineTune(0)));
+      //Intake
+        m_operatorController.leftBumper().onTrue(CommandController.Intake(1));
+        m_operatorController.leftBumper().onFalse(CommandController.Intake(0));
 
-    //Setpoint Controls
-    // m_operatorStation.button(SetPointConstants.kBargeSetpointButton).onTrue(Commands.runOnce(() -> m_robotIntake.ArmToSetpoint(SetPointConstants.kArmBargeSetpoint)));
-    // m_operatorStation.button(SetPointConstants.kProcessorSetpointButton).onTrue(Commands.runOnce(() -> m_robotIntake.ArmToSetpoint(SetPointConstants.kArmProcessorSetpoint)));
-    // m_operatorStation.button(SetPointConstants.kL2SetpointButton).onTrue(Commands.runOnce(() -> m_robotIntake.ArmToSetpoint(SetPointConstants.kArmL2Setpoint)));
-    // m_operatorStation.button(SetPointConstants.kL3SetpointButton).onTrue(Commands.runOnce(() -> m_robotIntake.ArmToSetpoint(SetPointConstants.kArmL3Setpoint)));
-    // m_operatorStation.button(SetPointConstants.kAlgaeOnCoralSetpointButton).onTrue(Commands.runOnce(() -> m_robotIntake.ArmToSetpoint(SetPointConstants.kArmAlgaeOnCoralSetpoint)));
-    // m_operatorStation.button(SetPointConstants.kAlgaeOnFloorSetpointButton).onTrue(Commands.runOnce(() -> m_robotIntake.ArmToSetpoint(SetPointConstants.kArmFloorSetpoint)));
+      //Manual Setpoint Controls
+      m_operatorController.povUp().onTrue(CommandController)
 
     //Barge Controls
   }

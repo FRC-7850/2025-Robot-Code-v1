@@ -34,7 +34,7 @@ public class ClimbSubsystem extends SubsystemBase{
         timeOrigin = Timer.getFPGATimestamp();
     }
 
-    public static void StopMotor(){
+    public static void StopClimb(){
         outputSetpoint = 0;
     }
 

@@ -43,6 +43,9 @@ public class ElevatorSubsystem extends SubsystemBase{
      //private DiffPIDOutput_PIDOutputModeValue
      private double encoderOffset;
      private double eleSetSpeed = ElevatorConstants.kElevatorMaxSpeed;
+     double eleSetpoint;
+     double maxEleSp = 0;
+     double minEleSp = 0;
      SparkLimitSwitch topSwitch = m_rightMotor.getForwardLimitSwitch();
      SparkLimitSwitch bottomSwitch = m_rightMotor.getReverseLimitSwitch();
 
@@ -80,7 +83,10 @@ public class ElevatorSubsystem extends SubsystemBase{
      }
 
      public void setToHeight(){
-          m_rightMotor.getClosedLoopController().setReference(eleSP.get().getDouble()+encoderOffset, SparkMax.ControlType.kPosition, ClosedLoopSlot.kSlot0);
+          // if((eleSetpoint >= maxEleSp) && (eleSetpoint <= minEleSp)){
+          //      m_rightMotor.getClosedLoopController().setReference(eleSetpoint+encoderOffset, SparkMax.ControlType.kPosition, ClosedLoopSlot.kSlot0);
+          // }
+          m_rightMotor.getClosedLoopController().setReference(eleSetpoint+encoderOffset, SparkMax.ControlType.kPosition, ClosedLoopSlot.kSlot0);
      }
 
      @Override
@@ -89,5 +95,14 @@ public class ElevatorSubsystem extends SubsystemBase{
          turns.setDouble(getEleEncoder());
          turnRate.setDouble(m_rightMotor.getEncoder().getVelocity());
          eleSetSpeed = eleSpeed.get().getDouble();
+         eleSetpoint = eleSP.getDouble(eleSetpoint);
+
+         if(bottomSwitch.isPressed()){
+          zeroEleEncoder();
+          System.out.println("Bottom Hit" + eleSetpoint);
+          }
+         if(topSwitch.isPressed()){
+           System.out.println("Bottom Hit" + eleSetpoint);
+          }
      }
 }

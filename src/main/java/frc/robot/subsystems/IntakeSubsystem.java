@@ -14,6 +14,8 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 public class IntakeSubsystem extends SubsystemBase{
      ShuffleboardTab intakeTestingTab = Shuffleboard.getTab("IntakeTestingTab");
      GenericEntry encoderReadout;
+     GenericEntry adjustableArmSpeed;
+     double armSpeed;
 
     //Set followers and PID constants in Rev client, because following only right motors are used in code
      private final SparkMax m_armMotorLeft = new SparkMax(OIConstants.kArmCanIDLeft, MotorType.kBrushed);
@@ -28,9 +30,9 @@ public class IntakeSubsystem extends SubsystemBase{
      public void RunArm(double polarity){          
           double speed = armMaxSpeed * polarity;
           if (speed > 0){
-               m_armMotorLeft.set(polarity * 0.8);
+               m_armMotorLeft.set(polarity * armSpeed);
           }else{
-               m_armMotorLeft.set(polarity * 0.1);
+               m_armMotorLeft.set(polarity * armSpeed);
           }
      }
 
@@ -55,10 +57,12 @@ public class IntakeSubsystem extends SubsystemBase{
      public IntakeSubsystem(){
           zeroArmEncoder();
           encoderReadout = intakeTestingTab.add("Encoder Readout", 0).getEntry();
+          adjustableArmSpeed = intakeTestingTab.add("Arm Speed Coefficient", 1).getEntry();
      }
 
      @Override
      public void periodic() {
           encoderReadout.setDouble(getArmEncoder());
+          armSpeed = adjustableArmSpeed.getDouble(armSpeed);
      }
 }

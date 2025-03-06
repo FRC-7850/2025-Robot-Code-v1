@@ -43,7 +43,6 @@ public class ElevatorSubsystem extends SubsystemBase{
      double maxEleSP = ElevatorConstants.kMaxEleSP;
      double minEleSP = ElevatorConstants.kMinEleSP;
 
-
      //Subsystem Method
      public ElevatorSubsystem(){
           //Shuffleboard Entry Creation
@@ -55,8 +54,6 @@ public class ElevatorSubsystem extends SubsystemBase{
           kD = elevatorDebug.add("kP", 0.5).getEntry();
 
           //Initialize
-          turns.setDouble(getEleEncoder());
-          turnRate.setDouble(m_rightMotor.getEncoder().getVelocity());
           zeroEleEncoder();  
      }
 
@@ -76,7 +73,9 @@ public class ElevatorSubsystem extends SubsystemBase{
      }
 
      public void setToHeight(double setpoint){
-          elevatorSetpoint = setpoint;
+          if((elevatorSetpoint >= maxEleSP) && (elevatorSetpoint <= minEleSP)){
+               elevatorSetpoint = setpoint;
+          }
      }
 
      @Override

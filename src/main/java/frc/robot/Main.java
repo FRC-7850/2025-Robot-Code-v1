@@ -21,6 +21,6 @@ public final class Main {
    */
   public static void main(String... args) {
     RobotBase.startRobot(Robot::new);
-    System.out.println("MAY THE CODE PASSING THROUGH THIS ROBORIO BRING A LITTLE MORE PEACE TO THIS TROUBLED WORLD");
+    System.out.println("MAY THE CODE PASSING THROUGH THIS ROBORIO SOMEHOW HELP TO BRING JUST A LITTLE MORE PEACE TO THIS TROUBLED WORLD");
   }
 }

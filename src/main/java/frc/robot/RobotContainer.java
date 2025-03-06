@@ -4,67 +4,58 @@
 
 package frc.robot;
 
+import java.nio.channels.SelectableChannel;
 //Java
 import java.util.List;
 
 //WPILib
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.filter.SlewRateLimiter;
-import edu.wpi.first.networktables.GenericEntry;
-import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.DriverStation.Alliance; //TODO What's this for?
-import edu.wpi.first.wpilibj.PS4Controller.Button; //Used for the drive command, though i think that's fucking stupid
-import edu.wpi.first.wpilibj.event.EventLoop;
-import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
-import edu.wpi.first.wpilibj2.command.SwerveControllerCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import edu.wpi.first.wpilibj2.command.button.JoystickButton;
-import edu.wpi.first.wpilibj2.command.button.POVButton;
 
 //PathPlanner
 import com.pathplanner.lib.commands.PathPlannerAuto;
 
   //File Structure
 //Constants
-import frc.robot.Constants.AutoConstants;
-import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.OIConstants;
-import frc.robot.Constants.SetPointConstants;
 import frc.robot.Constants.TransformConstants;
 //Subsystems
 import frc.robot.subsystems.DriveSubsystem;
-import frc.robot.subsystems.ElevatorSubsystem;
-import frc.robot.subsystems.IntakeSubsystem;
-import frc.robot.subsystems.LEDs;
 
 public class RobotContainer {
   //Shuffleboard Entries
   ShuffleboardTab auto = Shuffleboard.getTab("Autonomous");
-  GenericEntry selectAuto;
 
     //Definitions
   //Subsystems
   private final DriveSubsystem robotDrive = new DriveSubsystem();
   private final CommandController commandController = new CommandController();
   //Controllers
-  XboxController driverController = new XboxController(OIConstants.kDriverControllerPort);
+  CommandXboxController driverController = new CommandXboxController(OIConstants.kDriverControllerPort);
   CommandXboxController operatorController = new CommandXboxController(OIConstants.kOperationsControllerPort); 
   CommandJoystick operatorStation = new CommandJoystick(OIConstants.kButtonPanelControllerPort);
-  //Misc
-  SlewRateLimiter operatorFilter = new SlewRateLimiter(TransformConstants.kOperatorSlewRate);
-  public boolean pathingSwitch = false;
+   //Misc
+   SlewRateLimiter operatorFilter = new SlewRateLimiter(TransformConstants.kOperatorSlewRate);
+   public boolean pathingSwitch = false;
+   //Auto Chooser
+   SendableChooser<String> autoChooser;
 
   //File Method
   public RobotContainer() {
-    //Shuffleboard Entry Creation
-    selectAuto = auto.add("Autonomous Selected", 0).withWidget(BuiltInWidgets.kComboBoxChooser).getEntry();
+    //Chooser definitions
+    autoChooser.addOption("ExampleAuto1", "ExampleAutoName1");
+    autoChooser.addOption("ExampleAuto2", "ExampleAutoName2");
+    //Add to Shuffleboard
+    Shuffleboard.getTab("Autonomous").add("Select Auto", autoChooser);
 
     //Initialize
     configureButtonBindings();
@@ -107,11 +98,13 @@ public class RobotContainer {
     * Button 7:
    */
   private void configureButtonBindings() {
-    //Drive Controls
-    new JoystickButton(driverController, Button.kR1.value)
-        .whileTrue(new RunCommand(
-            () -> robotDrive.setX(),
-            robotDrive));
+    //Wheel Lock
+    driverController.x().whileTrue(new RunCommand(() -> robotDrive.setX(), robotDrive));
+
+    //Barge Controls
+    driverController.povUp().onTrue(commandController.Climb(1));
+    driverController.povDown().onTrue(commandController.Climb(-1));
+
 
     //Elevator Controls
       //Fine tune
@@ -125,21 +118,16 @@ public class RobotContainer {
         operatorController.axisMagnitudeGreaterThan(4, 0.1).whileTrue(commandController.ElevatorFineTune(operatorFilter.calculate(-operatorController.getLeftY())));
         operatorController.axisMagnitudeGreaterThan(4, 0.1).whileFalse(commandController.ElevatorFineTune(0));
       //Intake
-        operatorController.leftBumper().onTrue(commandController.Intake(1));
-        operatorController.leftBumper().onFalse(commandController.Intake(0));
+        operatorController.leftBumper().onTrue(commandController.Intake(true));
+        operatorController.leftBumper().onFalse(commandController.Intake(false));
 
     //Setpoint Controls
 
     //Pathing Controls
-     
-    //Barge Controls
-    driverController.povUp().whileTrue(commandController.Barge(1));
-    driverController.povDown().whileTrue(commandController.Barge(-1));
   }
 
   public Command getAutonomousCommand() {
-    // return new InstantCommand(null);
-
-    return new PathPlannerAuto("TestingShooterAuto");
+    return new InstantCommand(null);
+    // return new PathPlannerAuto(selectAuto.getString(null));
   }
 }

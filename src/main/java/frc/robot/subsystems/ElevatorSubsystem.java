@@ -21,6 +21,9 @@ import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import edu.wpi.first.wpilibj2.command.CommandXboxController;
+import edu.wpi.first.wpilibj2.command.CommandXboxController.RumbleType;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
@@ -86,16 +89,19 @@ public class ElevatorSubsystem extends SubsystemBase{
      }
 
      public double getSpeedRight(){
+          
           return m_rightMotor.getAppliedOutput();
+
      }
      
-     public void RunElevator(double polarity){
+     public void RunElevator(double polarity, CommandXboxController controller){
           // if((!topSwitch.isPressed() && polarity > 1) && (!bottomSwitch.isPressed() && polarity < 1)){
           //idk
                double speed = polarity * 0.5;
 
                //double speed = eleSetSpeed * polarity;
                m_leftMotor.set(speed);;
+               controller.setRumble(RumbleType.kBothRumble, 1);
           // }
      }
 

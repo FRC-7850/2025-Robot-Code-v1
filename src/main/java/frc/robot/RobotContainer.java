@@ -78,6 +78,8 @@ public class RobotContainer {
             m_robotDrive));
   }
 
+
+
   /**
    * Use this method to define your button->command mappings. Buttons can be
    * created by
@@ -109,7 +111,7 @@ public class RobotContainer {
     m_operatorController.axisMagnitudeGreaterThan(1, 0.1).onFalse(Commands.runOnce(() -> m_robotElevator.RunElevator(0)));
     // m_operatorController.axisMagnitudeGreaterThan(1, 0.1).whileTrue(Commands.run(() -> m_robotElevator.RunElevator(m_operatorController.getLeftY())));
     // m_operatorController.axisMagnitudeGreaterThan(1, 0.1).onFalse(Commands.runOnce(() -> m_robotElevator.RunElevator(0)));
-    m_operatorController.x().onTrue(Commands.runOnce(() -> m_robotElevator.setToHeight()));
+    
     //Disabled for Week Zero
     // m_operatorController.a().onTrue(Commands.runOnce(() -> m_robotElevator.setToHeight()));
 

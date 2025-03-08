@@ -17,13 +17,12 @@ import com.revrobotics.spark.config.SparkBaseConfig;
 import com.revrobotics.spark.config.SparkMaxConfig;
 
 import edu.wpi.first.wpilibj.RobotController;
+import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import edu.wpi.first.wpilibj2.command.CommandXboxController;
-import edu.wpi.first.wpilibj2.command.CommandXboxController.RumbleType;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
@@ -39,7 +38,7 @@ import edu.wpi.first.math.controller.ElevatorFeedforward;
 
 public class ElevatorSubsystem extends SubsystemBase{
      ShuffleboardTab elevatorTestingTab = Shuffleboard.getTab("ElevatorTestingTab");
-     GenericEntry turns, turnRate, eleSpeed, eleSP, speedRight, speedLeft, instantaneousAcceleration, maxAcceleration, encoderOffsetSB;
+     GenericEntry turns, turnRate, eleSpeed, eleSP, speedRight, speedLeft, instantaneousAcceleration, maxAcceleration, encoderOffsetSB, kV, calculatedValue;
 
 
      private final SparkMax m_leftMotor = new SparkMax(OIConstants.kElevatorCanIDLeft, MotorType.kBrushless); //Master
@@ -58,12 +57,11 @@ public class ElevatorSubsystem extends SubsystemBase{
      SparkLimitSwitch topSwitch = m_rightMotor.getForwardLimitSwitch();
      SparkLimitSwitch bottomSwitch = m_rightMotor.getReverseLimitSwitch();
 
-
-     private ElevatorFeedforward elevatorFeedForward = new ElevatorFeedforward(ElevatorConstants.kS, ElevatorConstants.kG, 
+     private ElevatorFeedforward elevatorFeedForward = new ElevatorFeedforward(ElevatorConstants.kS, ElevatorConstants.kG,
                          ElevatorConstants.kV, ElevatorConstants.kA);
-     private ProfiledPIDController elevatorPID = new ProfiledPIDController(ElevatorConstants.kP, ElevatorConstants.kI, ElevatorConstants.kD,new TrapezoidProfile.Constraints(
-              1000,
-              100));
+     private ProfiledPIDController elevatorPID = new ProfiledPIDController(ElevatorConstants.kP, ElevatorConstants.kI, ElevatorConstants.kD, new TrapezoidProfile.Constraints(
+              12,
+              36));
      //private SparkMaxConfig config;
 
      public void zeroEleEncoder(){
@@ -75,7 +73,7 @@ public class ElevatorSubsystem extends SubsystemBase{
      }
 
      public double getSpeedLeft(){
-          return m_leftMotor.getAppliedOutput();
+          return m_leftMotor.getEncoder().getVelocity();
      }
 
      public void getAccelerationLeft(){
@@ -89,19 +87,16 @@ public class ElevatorSubsystem extends SubsystemBase{
      }
 
      public double getSpeedRight(){
-          
           return m_rightMotor.getAppliedOutput();
-
      }
      
-     public void RunElevator(double polarity, CommandXboxController controller){
+     public void RunElevator(double polarity){
           // if((!topSwitch.isPressed() && polarity > 1) && (!bottomSwitch.isPressed() && polarity < 1)){
           //idk
                double speed = polarity * 0.5;
 
                //double speed = eleSetSpeed * polarity;
                m_leftMotor.set(speed);;
-               controller.setRumble(RumbleType.kBothRumble, 1);
           // }
      }
 
@@ -110,41 +105,33 @@ public class ElevatorSubsystem extends SubsystemBase{
           turnRate = elevatorTestingTab.add("Spark2 Velocity", 0).getEntry();
           eleSpeed = elevatorTestingTab.add("SetSpeed",eleSetSpeed).getEntry();
           eleSP = elevatorTestingTab.add("SetPoint",0).getEntry();
-          
-          //shuffle board stuff
-          instantaneousAcceleration = elevatorTestingTab.add("Instantaneous Acceleration", 0).getEntry();
-          instantaneousAcceleration = elevatorTestingTab.add("Max Acceleration", 0).getEntry();
-          speedLeft = elevatorTestingTab.add("Speed/Velocity", 0).getEntry();
+          instantaneousAcceleration = elevatorTestingTab.add("Instantaneous Acceleration", 0).withWidget(BuiltInWidgets.kGraph).getEntry();
+          maxAcceleration = elevatorTestingTab.add("Max Acceleration", 0).withWidget(BuiltInWidgets.kGraph).getEntry();
+          speedLeft = elevatorTestingTab.add("Speed/Velocity", 0).withWidget(BuiltInWidgets.kGraph).getEntry();
           speedRight = elevatorTestingTab.add("Feedforward Value", 0).getEntry();
           encoderOffsetSB = elevatorTestingTab.add("Encoder Offset", 0).getEntry();
+          kV = elevatorTestingTab.add("KG", 0).getEntry();
+          calculatedValue = elevatorTestingTab.add("Calculated Velocity", 0).getEntry();
           zeroEleEncoder();
           turns.setDouble(getEleEncoder());
           turnRate.setDouble(m_rightMotor.getEncoder().getVelocity());
           elevatorPID.setTolerance(.25);
      }
 
-     public void setToHeight(){
-          // if((eleSetpoint >= maxEleSp) && (eleSetpoint <= minEleSp)){
-          //      m_rightMotor.getClosedLoopController().setReference(eleSetpoint+encoderOffset, SparkMax.ControlType.kPosition, ClosedLoopSlot.kSlot0);
-          // }
-          System.out.println("Seen");
-          m_leftMotor.getClosedLoopController().setReference(eleSetpoint+encoderOffset, SparkMax.ControlType.kPosition, ClosedLoopSlot.kSlot0);
-     }
-
      @Override
      public void periodic() {
-         getAccelerationLeft();
+          elevatorFeedForward.setKa(kV.get().getDouble());
 
          // TODO Auto-generated method stub
          turns.setDouble(getEleEncoder());
-         turnRate.setDouble(m_rightMotor.getEncoder().getVelocity());
+         turnRate.setDouble(getSpeedLeft());
          eleSetSpeed = eleSpeed.get().getDouble();
          eleSetpoint = eleSP.getDouble(eleSetpoint);
          speedLeft.setDouble(getSpeedLeft());
-         instantaneousAcceleration.setDouble(derivativeMain);
-         maxAcceleration.setDouble(derivativeMax);
          encoderOffsetSB.setDouble(encoderOffset);
          speedRight.setDouble(elevatorFeedForward.calculate(0));
+         calculatedValue.setDouble(
+          elevatorPID.getSetpoint().velocity);
 
          if(m_leftMotor.getReverseLimitSwitch().isPressed()){
           zeroEleEncoder();
@@ -158,5 +145,11 @@ public class ElevatorSubsystem extends SubsystemBase{
           // m_rightMotor.set(0);
            System.out.println("Bottom Hit" + eleSetpoint);
           }
+
+          elevatorPID.setGoal(eleSetpoint);
+
+          m_leftMotor.setVoltage(
+               elevatorPID.calculate(getEleEncoder())
+                   + elevatorFeedForward.calculate(elevatorPID.getSetpoint().velocity));
+         }
      }
-}

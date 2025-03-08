@@ -134,12 +134,11 @@ public class RobotContainer {
     // m_operatorStation.button(SetPointConstants.kAlgaeOnCoralSetpointButton).onTrue(Commands.runOnce(() -> m_robotIntake.ArmToSetpoint(SetPointConstants.kArmAlgaeOnCoralSetpoint)));
     // m_operatorStation.button(SetPointConstants.kAlgaeOnFloorSetpointButton).onTrue(Commands.runOnce(() -> m_robotIntake.ArmToSetpoint(SetPointConstants.kArmFloorSetpoint)));
 
-    //Barge Controls
-    m_operatorController.rightTrigger().onTrue(Commands.runOnce(() -> m_robotClimber.Climb(1)));
-    m_operatorController.rightTrigger().onFalse(Commands.runOnce(() -> m_robotClimber.Climb(0)));
-    m_operatorController.leftTrigger().onTrue(Commands.runOnce(() -> m_robotClimber.Climb(-1)));
-    m_operatorController.leftTrigger().onFalse(Commands.runOnce(() -> m_robotClimber.Climb(0)));
-
+    //climber Controls
+    m_operatorController.rightBumper().onTrue(Commands.runOnce(() -> m_robotClimber.Climb(1)));
+    m_operatorController.rightBumper().onFalse(Commands.runOnce(() -> m_robotClimber.Climb(0)));
+    m_operatorController.rightTrigger().onTrue(Commands.runOnce(() -> m_robotClimber.Climb(-1)));
+   // m_operatorController.rightTrigger().onFalse(Commands.runOnce(() -> m_robotClimber.Climb(0)));
   }
 
   /**
@@ -187,8 +186,4 @@ public class RobotContainer {
     // Run path following command, then stop at the end.
     return swerveControllerCommand.andThen(() -> m_robotDrive.drive(0, 0, 0, false));
   }
-
-
-
-
 }

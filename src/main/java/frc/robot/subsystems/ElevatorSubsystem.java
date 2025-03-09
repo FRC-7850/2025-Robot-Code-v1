@@ -1,4 +1,5 @@
 package frc.robot.subsystems;
+import com.ctre.phoenix6.controls.DifferentialVoltage;
 import com.ctre.phoenix6.signals.DiffPIDOutput_PIDOutputModeValue;
 import com.revrobotics.servohub.ServoHub.ResetMode;
 import com.revrobotics.servohub.config.ServoHubParameter;
@@ -35,7 +36,7 @@ import edu.wpi.first.math.controller.ElevatorFeedforward;
 
 public class ElevatorSubsystem extends SubsystemBase{
      ShuffleboardTab elevatorTestingTab = Shuffleboard.getTab("ElevatorTestingTab");
-     GenericEntry turns, turnRate, eleSpeed, eleSP, speedRight, speedLeft, encoderOffsetSB;
+     GenericEntry turns, turnRate, eleSpeed, eleSP, speedRight, speedLeft, instantaneousAcceleration, maxAcceleration, encoderOffsetSB;
 
 
      private final SparkMax m_leftMotor = new SparkMax(OIConstants.kElevatorCanIDLeft, MotorType.kBrushless); //Master
@@ -46,6 +47,9 @@ public class ElevatorSubsystem extends SubsystemBase{
      double eleSetpoint;
      double maxEleSp = 0;
      double minEleSp = 0;
+     double derivativeMain = 0;
+     double derivativeMax = 0;
+     double[] deltaV = {0,0};
      
      //shuffleboard stuff
      SparkLimitSwitch topSwitch = m_rightMotor.getForwardLimitSwitch();
@@ -71,6 +75,16 @@ public class ElevatorSubsystem extends SubsystemBase{
           return m_leftMotor.getAppliedOutput();
      }
 
+     public void getAccelerationLeft(){
+         deltaV[0] = deltaV[1];
+         deltaV[1] = getSpeedLeft();
+         double derivative = deltaV[1] - deltaV[0];
+         derivativeMain = derivative;
+         if(Math.signum(derivative) > Math.signum(derivativeMax)){
+          derivativeMax = Math.signum(derivative);
+         }
+     }
+
      public double getSpeedRight(){
           return m_rightMotor.getAppliedOutput();
      }
@@ -92,11 +106,11 @@ public class ElevatorSubsystem extends SubsystemBase{
           eleSP = elevatorTestingTab.add("SetPoint",0).getEntry();
           
           //shuffle board stuff
-          speedLeft = elevatorTestingTab.add("LeftSpeed", 0).getEntry();
+          instantaneousAcceleration = elevatorTestingTab.add("Instantaneous Acceleration", 0).getEntry();
+          instantaneousAcceleration = elevatorTestingTab.add("Max Acceleration", 0).getEntry();
+          speedLeft = elevatorTestingTab.add("Speed/Velocity", 0).getEntry();
           speedRight = elevatorTestingTab.add("Feedforward Value", 0).getEntry();
           encoderOffsetSB = elevatorTestingTab.add("Encoder Offset", 0).getEntry();
-
-
           zeroEleEncoder();
           turns.setDouble(getEleEncoder());
           turnRate.setDouble(m_rightMotor.getEncoder().getVelocity());
@@ -113,14 +127,16 @@ public class ElevatorSubsystem extends SubsystemBase{
 
      @Override
      public void periodic() {
+         getAccelerationLeft();
+
          // TODO Auto-generated method stub
          turns.setDouble(getEleEncoder());
          turnRate.setDouble(m_rightMotor.getEncoder().getVelocity());
          eleSetSpeed = eleSpeed.get().getDouble();
-         
-         //shuffleboard stuff
          eleSetpoint = eleSP.getDouble(eleSetpoint);
          speedLeft.setDouble(getSpeedLeft());
+         instantaneousAcceleration.setDouble(derivativeMain);
+         maxAcceleration.setDouble(derivativeMax);
          encoderOffsetSB.setDouble(encoderOffset);
          speedRight.setDouble(elevatorFeedForward.calculate(0));
 

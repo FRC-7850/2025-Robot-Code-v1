@@ -96,8 +96,8 @@ public final class Constants {
     public static final int kElevatorCanIDRight = 21;
 
     //Arm/Intake (UNSET)
-    public static final int kArmCanIDLeft = 30;
-    public static final int kArmCanIDRight = 31;
+    public static final int kArmCanIDLeft = 16;
+    public static final int kArmCanIDRight = 55;
     public static final int kIntakeCanIDLeft = 40;
     public static final int kIntakeCanIDRight = 41;
 
@@ -142,15 +142,21 @@ public final class Constants {
     public static final int kUpButton = 2;
     public static final int kDownButton = 1;
     public static final double kElevatorMaxSpeed = .5;
-    public static final double kS = 0, kG = 0.39, kV = 0, kA = 0, kP = 0, kI = 0, kD = 0;
+    public static final double kS = 0, kG = 0.3, kV = 0.2612, kA = 0.1, kP = 1.25, kI = 0, kD = 0;
     public static final double kElevatorMaxHeight = 120.0;
+  }
+
+  public static final class ArmConstants{
+
+    public static final double kS = 0, kG = 0, kV = 0, kA = 0, kP = 0, kI = 0, kD = 0;
+  
   }
 
   public static final class IntakeConstants{
     public static final int kUpButton = 2;
     public static final int kDownButton = 1;
     public static final double kIntakeSpeed = 1;
-    public static final double kArmFineTuneSpeed = .5;
+    public static final double kArmFineTuneSpeed = .3;
   }
 
   public static final class SetPointConstants{

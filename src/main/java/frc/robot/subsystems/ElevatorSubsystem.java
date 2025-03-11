@@ -1,4 +1,6 @@
 package frc.robot.subsystems;
+import java.util.function.BooleanSupplier;
+
 import com.ctre.phoenix6.controls.DifferentialVoltage;
 import com.ctre.phoenix6.signals.DiffPIDOutput_PIDOutputModeValue;
 import com.revrobotics.servohub.ServoHub.ResetMode;
@@ -8,7 +10,8 @@ import com.revrobotics.spark.SparkBase;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkLimitSwitch;
-
+import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.Constants;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.ElevatorConstants;
 import frc.robot.Constants.OIConstants;
@@ -20,7 +23,6 @@ import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
-import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.math.controller.PIDController;
@@ -60,7 +62,7 @@ public class ElevatorSubsystem extends SubsystemBase{
      private ElevatorFeedforward elevatorFeedForward = new ElevatorFeedforward(ElevatorConstants.kS, ElevatorConstants.kG,
                          ElevatorConstants.kV, ElevatorConstants.kA);
      private ProfiledPIDController elevatorPID = new ProfiledPIDController(ElevatorConstants.kP, ElevatorConstants.kI, ElevatorConstants.kD, new TrapezoidProfile.Constraints(
-              12,
+              24,
               36));
      //private SparkMaxConfig config;
 
@@ -89,6 +91,41 @@ public class ElevatorSubsystem extends SubsystemBase{
      public double getSpeedRight(){
           return m_rightMotor.getAppliedOutput();
      }
+
+     public void setAntiGravity(){
+
+          m_leftMotor.setVoltage(Constants.ElevatorConstants.kG);
+     }
+
+     public void gotoPosition(double goal){
+          
+          elevatorPID.setGoal(goal);
+          m_leftMotor.setVoltage(
+               elevatorPID.calculate(getEleEncoder())
+                   + elevatorFeedForward.calculate(elevatorPID.getSetpoint().velocity));
+     }
+
+     public void gotoPositionPID(double goal){
+          
+          elevatorPID.setGoal(goal);
+          m_leftMotor.setVoltage(
+               elevatorPID.calculate(getEleEncoder())
+                   );
+     }
+
+     public boolean PIDAtSP(){
+          return elevatorPID.atGoal();
+     }
+
+     public void setFFAlone(){
+
+          m_leftMotor.setVoltage(
+               elevatorFeedForward.calculate(elevatorPID.getSetpoint().velocity));
+     }
+
+     public double getShuffleSP(){
+          return eleSetpoint;
+     }
      
      public void RunElevator(double polarity){
           // if((!topSwitch.isPressed() && polarity > 1) && (!bottomSwitch.isPressed() && polarity < 1)){
@@ -97,6 +134,7 @@ public class ElevatorSubsystem extends SubsystemBase{
 
                //double speed = eleSetSpeed * polarity;
                m_leftMotor.set(speed);;
+               //gotoPosition(getEleEncoder());
           // }
      }
 
@@ -120,8 +158,8 @@ public class ElevatorSubsystem extends SubsystemBase{
 
      @Override
      public void periodic() {
-          elevatorFeedForward.setKa(kV.get().getDouble());
-
+          //elevatorFeedForward.setKa(kV.get().getDouble());
+          //elevatorPID.setP(kV.get().getDouble());
          // TODO Auto-generated method stub
          turns.setDouble(getEleEncoder());
          turnRate.setDouble(getSpeedLeft());
@@ -131,7 +169,8 @@ public class ElevatorSubsystem extends SubsystemBase{
          encoderOffsetSB.setDouble(encoderOffset);
          speedRight.setDouble(elevatorFeedForward.calculate(0));
          calculatedValue.setDouble(
-          elevatorPID.getSetpoint().velocity);
+          elevatorPID.calculate(getEleEncoder())
+                   + elevatorFeedForward.calculate(elevatorPID.getSetpoint().velocity));
 
          if(m_leftMotor.getReverseLimitSwitch().isPressed()){
           zeroEleEncoder();
@@ -146,10 +185,25 @@ public class ElevatorSubsystem extends SubsystemBase{
            System.out.println("Bottom Hit" + eleSetpoint);
           }
 
-          elevatorPID.setGoal(eleSetpoint);
+         /*  elevatorPID.setGoal(eleSetpoint);
 
           m_leftMotor.setVoltage(
                elevatorPID.calculate(getEleEncoder())
                    + elevatorFeedForward.calculate(elevatorPID.getSetpoint().velocity));
-         }
+         */}
+////////////////////////testing elevator setpoints as a command/////////////////////////////////////
+         public Command ElevatorPIDCommand(double elevatorSetpoint) {
+          
+          return 
+                  // Run the shooter flywheel at the desired setpoint using feedforward and feedback
+                  run(
+                      () -> {
+                         gotoPosition(eleSetpoint);
+                        }
+      
+                  // Wait until the shooter has reached the setpoint, and then run the feeder
+                  );//.until(elevatorPID::atSetpoint);
+              
+        }
+////////////////////////////////////////////////////////////
      }

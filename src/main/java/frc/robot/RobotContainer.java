@@ -96,8 +96,8 @@ public class RobotContainer {
             () -> m_robotDrive.setX(),
             m_robotDrive));
 
-            m_operatorController.y().onTrue(Commands.runOnce(
-                () -> m_robotElevator.zeroEleEncoder(),m_robotElevator));
+            // m_operatorController.y().onTrue(Commands.runOnce(
+            //     () -> m_robotIntake.zeroArmEncoder(),m_robotIntake));
 
     //Elevator Controls
     // m_operatorController.povDown().onTrue(Commands.runOnce(() -> m_robotElevator.RunElevator(-1)));
@@ -107,8 +107,8 @@ public class RobotContainer {
     // m_operatorController.axisGreaterThan(1, 0.1).onTrue(Commands.runOnce(() -> m_robotElevator.RunElevator(-1)));
     // m_operatorController.axisLessTHan(1, 0.1).onTrue(Commands.runOnce(() -> m_robotElevator.RunElevator(-1)));
     m_operatorController.axisMagnitudeGreaterThan(1, 0.1).whileTrue(Commands.run(() -> m_robotElevator.RunElevator(-m_operatorController.getLeftY())));
-    m_operatorController.axisMagnitudeGreaterThan(1, 0.1).onTrue(Commands.runOnce(() -> m_robotElevator.RunElevator(0)));
-    m_operatorController.axisMagnitudeGreaterThan(1, 0.1).onFalse(Commands.runOnce(() -> m_robotElevator.RunElevator(0)));
+    //m_operatorController.axisMagnitudeGreaterThan(1, 0.1).onTrue(Commands.runOnce(() -> m_robotElevator.RunElevator(0)));
+    m_operatorController.axisMagnitudeGreaterThan(1, 0.1).onFalse(Commands.runOnce(() -> m_robotElevator.RunElevator(0)).andThen(()->m_robotElevator.setAntiGravity()));
     // m_operatorController.axisMagnitudeGreaterThan(1, 0.1).whileTrue(Commands.run(() -> m_robotElevator.RunElevator(m_operatorController.getLeftY())));
     // m_operatorController.axisMagnitudeGreaterThan(1, 0.1).onFalse(Commands.runOnce(() -> m_robotElevator.RunElevator(0)));
     
@@ -116,10 +116,15 @@ public class RobotContainer {
     // m_operatorController.a().onTrue(Commands.runOnce(() -> m_robotElevator.setToHeight()));
 
     // Intake Controls (DEMO!)
-    m_operatorController.povUp().onTrue(Commands.runOnce(() -> m_robotIntake.RunArm(1)));
+    /*m_operatorController.povUp().onTrue(Commands.runOnce(() -> m_robotIntake.RunArm(1)));
     m_operatorController.povUp().onFalse(Commands.runOnce(() -> m_robotIntake.RunArm(0)));
     m_operatorController.povDown().onTrue(Commands.runOnce(() -> m_robotIntake.RunArm(-1)));
-    m_operatorController.povDown().onFalse(Commands.runOnce(() -> m_robotIntake.RunArm(0)));
+    m_operatorController.povDown().onFalse(Commands.runOnce(() -> m_robotIntake.RunArm(0)));*/
+
+    m_operatorController.axisMagnitudeGreaterThan(5, 0.2).whileTrue(Commands.run(() -> m_robotIntake.RunArm(-m_operatorController.getRightY())));
+    //m_operatorController.axisMagnitudeGreaterThan(1, 0.1).onTrue(Commands.runOnce(() -> m_robotElevator.RunElevator(0)));
+    m_operatorController.axisMagnitudeGreaterThan(5, 0.2).onFalse(Commands.runOnce(() -> m_robotIntake.RunArm(0)));
+
     m_operatorController.leftBumper().onTrue(Commands.runOnce(() -> m_robotIntake.RunIntake(1)));
     //m_operatorController.rightBumper().onTrue(Commands.runOnce(() ->, null));
     m_operatorController.leftBumper().onFalse(Commands.runOnce(() -> m_robotIntake.RunIntake(0)));
@@ -127,6 +132,11 @@ public class RobotContainer {
     m_operatorController.leftTrigger().onFalse(Commands.runOnce(() -> m_robotIntake.RunIntake(0)));
 
     //Setpoint Controls
+    m_operatorController.a().onTrue(Commands.run(() -> m_robotIntake.gotoPosition()));
+    /*m_operatorController.x().onTrue(Commands.runOnce(() -> m_robotIntake.setAntiGravity()));
+    m_operatorController.b().onTrue(Commands.runOnce(() -> m_robotIntake.setAntiGravityOff()));*/
+
+    //m_operatorController.b().onTrue(Commands.run(() -> m_robotElevator.gotoPositionPID(20)).until(()->m_robotElevator.PIDAtSP()));
     // m_operatorStation.button(SetPointConstants.kBargeSetpointButton).onTrue(Commands.runOnce(() -> m_robotIntake.ArmToSetpoint(SetPointConstants.kArmBargeSetpoint)));
     // m_operatorStation.button(SetPointConstants.kProcessorSetpointButton).onTrue(Commands.runOnce(() -> m_robotIntake.ArmToSetpoint(SetPointConstants.kArmProcessorSetpoint)));
     // m_operatorStation.button(SetPointConstants.kL2SetpointButton).onTrue(Commands.runOnce(() -> m_robotIntake.ArmToSetpoint(SetPointConstants.kArmL2Setpoint)));

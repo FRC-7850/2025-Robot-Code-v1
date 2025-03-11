@@ -1,7 +1,7 @@
 package frc.robot.subsystems;
 
-import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 //WPILib
+import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -46,8 +46,8 @@ public class ElevatorSubsystem extends SubsystemBase{
      //Subsystem Method
      public ElevatorSubsystem(){
           //Shuffleboard Entry Creation
-          turns = elevatorDebug.add("Spark Poition", 0).getEntry();
-          turnRate = elevatorDebug.add("Spark Velocity", 0).getEntry();
+          turns = elevatorDebug.add("Spark Poition", 0).withWidget(BuiltInWidgets.kGraph).getEntry();
+          turnRate = elevatorDebug.add("Spark Velocity", 0).withWidget(BuiltInWidgets.kGraph).getEntry();
           eleSP = elevatorDebug.add("SetPoint",0).getEntry();
           kP = elevatorDebug.add("kP", 0.5).getEntry();
           kI = elevatorDebug.add("kP", 0.5).getEntry();
@@ -94,6 +94,6 @@ public class ElevatorSubsystem extends SubsystemBase{
          if(bottomSwitch.isPressed()){zeroEleEncoder();}
 
          //Run PID
-         elevatorController.setReference(elevatorSetpoint+encoderOffset, SparkMax.ControlType.kPosition, ClosedLoopSlot.kSlot0, elevatorFeedForward.calculate(0));
+        m_l
      }
 }

@@ -149,7 +149,6 @@ public final class Constants {
   public static final class ArmConstants{
 
     public static final double kS = 0, kG = 0, kV = 0, kA = 0, kP = 0, kI = 0, kD = 0;
-  
   }
 
   public static final class IntakeConstants{

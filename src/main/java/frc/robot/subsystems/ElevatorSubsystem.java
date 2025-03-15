@@ -40,20 +40,17 @@ import edu.wpi.first.math.controller.ElevatorFeedforward;
 
 public class ElevatorSubsystem extends SubsystemBase{
      ShuffleboardTab elevatorTestingTab = Shuffleboard.getTab("ElevatorTestingTab");
-     GenericEntry turns, turnRate, eleSpeed, eleSP, speedRight, speedLeft, instantaneousAcceleration, maxAcceleration, encoderOffsetSB, kV, calculatedValue;
+     GenericEntry turns, turnRate, eleSpeed, eleSP, speedRight, speedLeft, FeedForward, maxAcceleration, encoderOffsetSB, kV, calculatedValue;
 
 
      private final SparkMax m_leftMotor = new SparkMax(OIConstants.kElevatorCanIDLeft, MotorType.kBrushless); //Master
      private final SparkMax m_rightMotor = new SparkMax(OIConstants.kElevatorCanIDRight, MotorType.kBrushless); //Has Limit Switch
      //private DiffPIDOutput_PIDOutputModeValue
      private double encoderOffset;
-     private double eleSetSpeed = ElevatorConstants.kElevatorMaxSpeed;
      double eleSetpoint;
      double maxEleSp = 0;
      double minEleSp = 0;
-     double derivativeMain = 0;
-     double derivativeMax = 0;
-     double[] deltaV = {0,0};
+     double voltage;
      
      //shuffleboard stuff
      SparkLimitSwitch topSwitch = m_rightMotor.getForwardLimitSwitch();
@@ -62,9 +59,10 @@ public class ElevatorSubsystem extends SubsystemBase{
      private ElevatorFeedforward elevatorFeedForward = new ElevatorFeedforward(ElevatorConstants.kS, ElevatorConstants.kG,
                          ElevatorConstants.kV, ElevatorConstants.kA);
      private ProfiledPIDController elevatorPID = new ProfiledPIDController(ElevatorConstants.kP, ElevatorConstants.kI, ElevatorConstants.kD, new TrapezoidProfile.Constraints(
-              24,
-              36));
+              130,
+              130));
      //private SparkMaxConfig config;
+     //24,36
 
      public void zeroEleEncoder(){
           encoderOffset = m_leftMotor.getEncoder().getPosition();
@@ -78,54 +76,36 @@ public class ElevatorSubsystem extends SubsystemBase{
           return m_leftMotor.getEncoder().getVelocity();
      }
 
-     public void getAccelerationLeft(){
-         deltaV[0] = deltaV[1];
-         deltaV[1] = getSpeedLeft();
-         double derivative = deltaV[1] - deltaV[0];
-         derivativeMain = derivative;
-         if(Math.signum(derivative) > Math.signum(derivativeMax)){
-          derivativeMax = Math.signum(derivative);
-         }
-     }
-
      public double getSpeedRight(){
           return m_rightMotor.getAppliedOutput();
      }
 
      public void setAntiGravity(){
-
           m_leftMotor.setVoltage(Constants.ElevatorConstants.kG);
      }
 
-     public void gotoPosition(double goal){
-          
-          elevatorPID.setGoal(goal);
-          m_leftMotor.setVoltage(
-               elevatorPID.calculate(getEleEncoder())
-                   + elevatorFeedForward.calculate(elevatorPID.getSetpoint().velocity));
+     public void gotoPosition(){
+          m_leftMotor.setVoltage(voltage);
+          calculatedValue.setDouble(voltage);
+          FeedForward.setDouble(elevatorFeedForward.calculate(elevatorPID.getSetpoint().velocity));
      }
 
-     public void gotoPositionPID(double goal){
-          
-          elevatorPID.setGoal(goal);
-          m_leftMotor.setVoltage(
-               elevatorPID.calculate(getEleEncoder())
-                   );
+     public void calculatePID(){
+          voltage = elevatorPID.calculate(getEleEncoder())
+          + elevatorFeedForward.calculate(elevatorPID.getSetpoint().velocity);
      }
 
-     public boolean PIDAtSP(){
+     public void calculatePIDFineTune(){
+          elevatorPID.setGoal(getEleEncoder());
+          voltage = elevatorPID.calculate(getEleEncoder())
+          + elevatorFeedForward.calculate(elevatorPID.getSetpoint().velocity);
+     }
+
+     public boolean PIDAtGoal(){
           return elevatorPID.atGoal();
      }
 
-     public void setFFAlone(){
-
-          m_leftMotor.setVoltage(
-               elevatorFeedForward.calculate(elevatorPID.getSetpoint().velocity));
-     }
-
-     public double getShuffleSP(){
-          return eleSetpoint;
-     }
+     
      
      public void RunElevator(double polarity){
           // if((!topSwitch.isPressed() && polarity > 1) && (!bottomSwitch.isPressed() && polarity < 1)){
@@ -138,18 +118,21 @@ public class ElevatorSubsystem extends SubsystemBase{
           // }
      }
 
+     public void setSetpoint(){
+          elevatorPID.setGoal(eleSP.get().getDouble());
+     }
+
+     public void setSetpointButton(double goal){
+          elevatorPID.setGoal(goal);
+     }
+
      public ElevatorSubsystem(){
-          turns = elevatorTestingTab.add("Spark2 Poition", 0).getEntry();
+          turns = elevatorTestingTab.add("Encoder Readout", 0).getEntry();
           turnRate = elevatorTestingTab.add("Spark2 Velocity", 0).getEntry();
-          eleSpeed = elevatorTestingTab.add("SetSpeed",eleSetSpeed).getEntry();
-          eleSP = elevatorTestingTab.add("SetPoint",0).getEntry();
-          instantaneousAcceleration = elevatorTestingTab.add("Instantaneous Acceleration", 0).withWidget(BuiltInWidgets.kGraph).getEntry();
-          maxAcceleration = elevatorTestingTab.add("Max Acceleration", 0).withWidget(BuiltInWidgets.kGraph).getEntry();
-          speedLeft = elevatorTestingTab.add("Speed/Velocity", 0).withWidget(BuiltInWidgets.kGraph).getEntry();
-          speedRight = elevatorTestingTab.add("Feedforward Value", 0).getEntry();
-          encoderOffsetSB = elevatorTestingTab.add("Encoder Offset", 0).getEntry();
-          kV = elevatorTestingTab.add("KG", 0).getEntry();
-          calculatedValue = elevatorTestingTab.add("Calculated Velocity", 0).getEntry();
+          eleSP = elevatorTestingTab.add("Setpoint", 0).getEntry();
+          calculatedValue = elevatorTestingTab.add("Votage", 0).getEntry();
+          FeedForward = elevatorTestingTab.add("FF", 0).getEntry();
+
           zeroEleEncoder();
           turns.setDouble(getEleEncoder());
           turnRate.setDouble(m_rightMotor.getEncoder().getVelocity());
@@ -161,49 +144,15 @@ public class ElevatorSubsystem extends SubsystemBase{
           //elevatorFeedForward.setKa(kV.get().getDouble());
           //elevatorPID.setP(kV.get().getDouble());
          // TODO Auto-generated method stub
+
          turns.setDouble(getEleEncoder());
          turnRate.setDouble(getSpeedLeft());
-         eleSetSpeed = eleSpeed.get().getDouble();
-         eleSetpoint = eleSP.getDouble(eleSetpoint);
-         speedLeft.setDouble(getSpeedLeft());
-         encoderOffsetSB.setDouble(encoderOffset);
-         speedRight.setDouble(elevatorFeedForward.calculate(0));
-         calculatedValue.setDouble(
-          elevatorPID.calculate(getEleEncoder())
-                   + elevatorFeedForward.calculate(elevatorPID.getSetpoint().velocity));
 
          if(m_leftMotor.getReverseLimitSwitch().isPressed()){
           zeroEleEncoder();
-          // m_leftMotor.set(0);
-          // m_rightMotor.set(0);
-          System.out.println("Bottom Hit" + eleSetpoint);
           }
 
-         if(m_leftMotor.getForwardLimitSwitch().isPressed()){
-          // m_leftMotor.set(0);
-          // m_rightMotor.set(0);
-           System.out.println("Bottom Hit" + eleSetpoint);
+     //     if(m_leftMotor.getForwardLimitSwitch().isPressed()){
+     //      }
           }
-
-         /*  elevatorPID.setGoal(eleSetpoint);
-
-          m_leftMotor.setVoltage(
-               elevatorPID.calculate(getEleEncoder())
-                   + elevatorFeedForward.calculate(elevatorPID.getSetpoint().velocity));
-         */}
-////////////////////////testing elevator setpoints as a command/////////////////////////////////////
-         public Command ElevatorPIDCommand(double elevatorSetpoint) {
-          
-          return 
-                  // Run the shooter flywheel at the desired setpoint using feedforward and feedback
-                  run(
-                      () -> {
-                         gotoPosition(eleSetpoint);
-                        }
-      
-                  // Wait until the shooter has reached the setpoint, and then run the feeder
-                  );//.until(elevatorPID::atSetpoint);
-              
-        }
-////////////////////////////////////////////////////////////
      }

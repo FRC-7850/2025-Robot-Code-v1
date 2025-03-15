@@ -142,13 +142,13 @@ public final class Constants {
     public static final int kUpButton = 2;
     public static final int kDownButton = 1;
     public static final double kElevatorMaxSpeed = .5;
-    public static final double kS = 0, kG = 0.3, kV = 0.2612, kA = 0.1, kP = 1.25, kI = 0, kD = 0;
+    public static final double kS = 0, kG = 0.3, kV = 0.2612, kA = 0, kP = 2, kI = 0, kD = 0;
     public static final double kElevatorMaxHeight = 120.0;
   }
 
   public static final class ArmConstants{
 
-    public static final double kS = 0, kG = 0, kV = 0, kA = 0, kP = 0, kI = 0, kD = 0;
+    public static final double kS = 0, kG = 0, kV = .162, kA = 0, kP = .25, kI = 0, kD = 0;
   }
 
   public static final class IntakeConstants{
@@ -160,27 +160,36 @@ public final class Constants {
 
   public static final class SetPointConstants{
     //Driverstation Button -> Setpoint Bindings (Unset)
-    public static final int kBargeSetpointButton = 0;
-    public static final int kProcessorSetpointButton = 1;
-    public static final int kL3SetpointButton = 2;
-    public static final int kL2SetpointButton = 3;
-    public static final int kAlgaeOnCoralSetpointButton = 4;
-    public static final int kAlgaeOnFloorSetpointButton = 5;
+    public static final int kBargeForwardSetpointButton = 1;
+    public static final int kBargeBackwardSetpointButton = 2;
+    public static final int kProcessorSetpointButton = 3;
+    public static final int kL3SetpointButton = 5;
+    public static final int kL2SetpointButton = 4;
+    public static final int kAlgaeOnCoralSetpointButton = 6;
+    public static final int kAlgaeOnFloorSetpointButton = 7;
+    public static final int kHomePositionButton = 8;
 
     //Setpoint Values (Unset)
       //Elevator
-      public static final double kElevatorBargeSetpoint = 0;
-      public static final double kElevatorProcessorSetpoint = 0;
-      public static final double kElevatorL3Setpoint = 0;
-      public static final double kElevatorL2Setpoint = 0;
-      public static final double kElevatorAlgaeOnCoralSetpoint = 0;
-      public static final double kElevatorFloorSetpoint = 0;
+      public static final double kElevatorBargeForwardSetpoint = 118;
+      public static final double kElevatorBargeBackwardSetpoint = 118;
+      public static final double kElevatorProcessorSetpoint = 22;
+      public static final double kElevatorL3Setpoint = 37;
+      public static final double kElevatorL2Setpoint = 67;
+      public static final double kElevatorAlgaeOnCoralSetpoint = 4;
+      public static final double kElevatorFloorSetpoint = 13;
+      public static final double kElevatorHomePositionSetpoint = 0;
+
        //Arm
-       public static final double kArmBargeSetpoint = 0;
-       public static final double kArmProcessorSetpoint = 0;
-       public static final double kArmL3Setpoint = 0;
-       public static final double kArmL2Setpoint = 0;
-       public static final double kArmAlgaeOnCoralSetpoint = 0;
-       public static final double kArmFloorSetpoint = 0;
+       public static final double kArmBargeForwardSetpoint = -45;
+       public static final double kArmBargeBackwardSetpoint = -10;
+       public static final double kArmProcessorSetpoint = -90;
+       public static final double kArmL3Setpoint = -69;
+       public static final double kArmL2Setpoint = -69;
+       public static final double kArmAlgaeOnCoralSetpoint = -76;
+       public static final double kArmFloorSetpoint = -98;
+       public static final double kArmOutSetpoint = -77;
+       public static final double kArmHomePositionSetpoint = 0;
+
   }
 }

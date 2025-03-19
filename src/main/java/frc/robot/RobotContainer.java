@@ -34,7 +34,6 @@ import frc.robot.subsystems.DriveSubsystem;
 public class RobotContainer {
   //Shuffleboard Entries
   ShuffleboardTab auto = Shuffleboard.getTab("Autonomous");
-
     //Definitions
   //Subsystems
   private final DriveSubsystem robotDrive = new DriveSubsystem();
@@ -102,9 +101,8 @@ public class RobotContainer {
     driverController.x().whileTrue(new RunCommand(() -> robotDrive.setX(), robotDrive));
 
     //Barge Controls
-    driverController.povUp().onTrue(commandController.Climb(1));
+    driverController.povUp().whileTrue(commandController.Climb(1));
     driverController.povDown().onTrue(commandController.Climb(-1));
-
 
     //Elevator Controls
       //Fine tune
@@ -120,9 +118,10 @@ public class RobotContainer {
       //Intake
         operatorController.leftBumper().onTrue(commandController.Intake(true));
         operatorController.leftBumper().onFalse(commandController.Intake(false));
+        operatorController.a(commandController.zeroEleEncoderNoCommands(0));
 
     //Setpoint Controls
-
+    
     //Pathing Controls
   }
 

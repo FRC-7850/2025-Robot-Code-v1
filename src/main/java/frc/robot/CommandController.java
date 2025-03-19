@@ -21,6 +21,7 @@
  //Constants
  import frc.robot.Constants.NeoMotorConstants;
  import frc.robot.Constants.SetPointConstants;
+ import frc.robot.Constants.IntakeConstants;
 
  public class CommandController extends SubsystemBase{
     //Definitions
@@ -29,20 +30,6 @@
     PoseSubsystem poseSubsystem = new PoseSubsystem();
     ClimbSubsystem climbSubsystem = new ClimbSubsystem();
     int setpointSelected;
-    double[] eleSetpoints = {
-        SetPointConstants.kElevatorBargeSetpoint,
-        SetPointConstants.kElevatorL3Setpoint,
-        SetPointConstants.kElevatorL2Setpoint,
-        SetPointConstants.kElevatorAlgaeOnCoralSetpoint,
-        SetPointConstants.kElevatorProcessorSetpoint,
-    };
-    double[] armSetpoints = {
-        SetPointConstants.kArmBargeSetpoint,
-        SetPointConstants.kArmL3Setpoint,
-        SetPointConstants.kArmL2Setpoint,
-        SetPointConstants.kArmAlgaeOnCoralSetpoint,
-        SetPointConstants.kArmProcessorSetpoint,
-    };
 
     //Subsystem Method
     public CommandController(){
@@ -57,39 +44,61 @@
 
     }
 
-    public Command PIDSuperCommand(){
-        return new InstantCommand(() -> elevatorSubsystem.setToHeight(eleSetpoints[setpointSelected])).alongWith(IntakeSubsystem.setToHeight(eleSetpoints[setpointSelected]));
+    public void PIDSuperCommand(double intakeSetpoint, double elevatorSetpoint){
+        //Initial safety arm PID with intentional overshoot.
+        if (intakeSubsystem.getArmEncoder() > IntakeConstants.kIntakeSafeEncoderValue){
+            Commands.runOnce(() -> intakeSubsystem.SetGoal(IntakeConstants.kIntakeSafeEncoderValueAdjusted), intakeSubsystem).andThen
+            (Commands.run(() -> intakeSubsystem.gotoPosition(), intakeSubsystem)).until(() -> intakeSubsystem.AtGoal(intakeSetpoint)).andThen
+            (Commands.runOnce(() -> intakeSubsystem.setAntiGravity(), intakeSubsystem));
+        }
+        
+        /* Either the arm's setpoint is within the safe range, or it's outside. In either case, the elevator can
+        * immediately run while the arm will have to wait for the elevator reach its setpoint if it's outisde
+        * of the safe range.
+        */
+        if (intakeSetpoint < IntakeConstants.kIntakeSafeEncoderValue){
+            //Within safe zone
+            Commands.runOnce(() -> intakeSubsystem.SetGoal(intakeSetpoint), intakeSubsystem).alongWith
+            (Commands.runOnce(() -> elevatorSubsystem.SetGoal(elevatorSetpoint), elevatorSubsystem)).andThen
+            (Commands.run(() -> intakeSubsystem.gotoPosition(), intakeSubsystem)).until(() -> intakeSubsystem.AtGoal(intakeSetpoint)).alongWith
+            (Commands.run(() -> elevatorSubsystem.gotoPosition(), elevatorSubsystem)).until(() -> elevatorSubsystem.atGoal()).andThen
+            (Commands.runOnce(() -> elevatorSubsystem.setAntiGravity(), elevatorSubsystem)).alongWith
+            (Commands.runOnce(() -> elevatorSubsystem.setAntiGravity(), elevatorSubsystem));
+        }else{
+            //Outside safe zone
+            Commands.runOnce(() -> intakeSubsystem.SetGoal(intakeSetpoint), intakeSubsystem).alongWith
+            (Commands.runOnce(() -> elevatorSubsystem.SetGoal(elevatorSetpoint), elevatorSubsystem)).andThen
+            (Commands.run(() -> elevatorSubsystem.gotoPosition(), elevatorSubsystem)).until(() -> elevatorSubsystem.atGoal()).andThen
+            (Commands.run(() -> intakeSubsystem.gotoPosition(), intakeSubsystem)).until(() -> intakeSubsystem.AtGoal(intakeSetpoint)).andThen
+            (Commands.runOnce(() -> elevatorSubsystem.setAntiGravity(), elevatorSubsystem)).alongWith
+            (Commands.runOnce(() -> elevatorSubsystem.setAntiGravity(), elevatorSubsystem));
+        }
     }
 
-    public Command ElevatorFineTune(double input){
-        return new RunCommand(() -> elevatorSubsystem.ElevatorFineTune(input),elevatorSubsystem);
+    public void ElevatorFineTune(double input){
+        Commands.run(() -> elevatorSubsystem.ElevatorFineTune(input),elevatorSubsystem);
     }
 
-    public Command ArmFineTune(double input){
-        return new RunCommand(() -> intakeSubsystem.ArmFineTune(input),elevatorSubsystem);    }
+    public void zeroEleEncoderNoCommands(double input){
+        Commands.run(() -> intakeSubsystem.ArmFineTune(input),elevatorSubsystem);
+    }
 
-    public Command Intake(boolean toggle){
-        return this.runOnce(() -> IntakeSubsystem.Intake(toggle));
+    public void ArmFineTune(double input){
+        Commands.run(() -> intakeSubsystem.ArmFineTune(input),elevatorSubsystem);    }
+
+    public void Intake(){
+        Commands.runOnce(() -> intakeSubsystem.Intake());
     }
     
-    public Command Shoot(booelan toggle){
-        return this.runOnce(() -> IntakeSubsystem.Shoot(toggle));
+    public void Shoot(){
+        Commands.runOnce(() -> intakeSubsystem.Shoot());
     }
 
-    public Command Climb(double polarity){
-        return new InstantCommand(() -> ClimbSubsystem.Climb(NeoMotorConstants.kClimberSpeed * polarity));
+    public void Climb(double polarity){
+        Commands.run(() -> ClimbSubsystem.Climb(NeoMotorConstants.kClimberSpeed * polarity));
     }
 
-    public Command StopClimb(){
-        return new InstantCommand(() -> ClimbSubsystem.StopClimb());
+    public void StopClimb(){
+       Commands.runOnce(() -> ClimbSubsystem.StopClimb());
     }
-
-    //Old idea for setpoint selection
-    // public void BrowseSetpointList(int i){
-    //     setpointSelected = (setpointSelected == 4) ? 0 : setpointSelected + i;
-    // }
-
-    //Coral Integration?
-    // public Command CoralIntake(){
-    // }
  }

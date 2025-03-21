@@ -148,7 +148,7 @@ public final class Constants {
 
   public static final class ArmConstants{
 
-    public static final double kS = 0, kG = 0, kV = .162, kA = 0, kP = .25, kI = 0, kD = 0;
+    public static final double kS = .125, kG = .225, kV = 4, kA = 2, kP = 3, kI = 0, kD = 0; //kv = .162, kp = .25
   }
 
   public static final class IntakeConstants{
@@ -182,13 +182,13 @@ public final class Constants {
 
        //Arm
        public static final double kArmBargeForwardSetpoint = -45;
-       public static final double kArmBargeBackwardSetpoint = -10;
+       public static final double kArmBargeBackwardSetpoint = 2.1;
        public static final double kArmProcessorSetpoint = -90;
        public static final double kArmL3Setpoint = -69;
        public static final double kArmL2Setpoint = -69;
        public static final double kArmAlgaeOnCoralSetpoint = -76;
-       public static final double kArmFloorSetpoint = -98;
-       public static final double kArmOutSetpoint = -77;
+       public static final double kArmFloorSetpoint = -.5;
+       public static final double kArmOutSetpoint = 0;
        public static final double kArmHomePositionSetpoint = 0;
 
   }

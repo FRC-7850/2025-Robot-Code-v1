@@ -80,15 +80,15 @@ public class RobotContainer {
   }
 
   public void SetPids(double armSetpoint, double elevatorSetpoint){
-    Commands.runOnce(() -> m_robotIntake.setSetpointButton(SetPointConstants.kArmOutSetpoint), m_robotIntake)
-    .andThen(Commands.run(() -> m_robotIntake.gotoPosition(), m_robotIntake).until(() -> m_robotIntake.PIDAtGoal()))
-    .andThen(Commands.runOnce(() -> m_robotIntake.setAntiGravity(), m_robotIntake))
-    .andThen(Commands.runOnce(() -> m_robotElevator.setSetpointButton(elevatorSetpoint), m_robotElevator))
-    .andThen(Commands.run(() -> m_robotElevator.gotoPosition(), m_robotElevator).until(() -> m_robotElevator.PIDAtGoal()))
-    .andThen(Commands.runOnce(() -> m_robotElevator.setAntiGravity(), m_robotElevator))
-    .andThen(Commands.runOnce(() -> m_robotIntake.setSetpointButton(armSetpoint), m_robotIntake))
-    .andThen(Commands.run(() -> m_robotIntake.gotoPosition(), m_robotIntake).until(() -> m_robotIntake.PIDAtGoal()))
-    .andThen(Commands.runOnce(() -> m_robotIntake.setAntiGravity(), m_robotIntake));
+    // Commands.runOnce(() -> m_robotIntake.setSetpointButton(SetPointConstants.kArmOutSetpoint), m_robotIntake)
+    // .andThen(Commands.run(() -> m_robotIntake.gotoPosition(), m_robotIntake).until(() -> m_robotIntake.PIDAtGoal()))
+    // // .andThen(Commands.runOnce(() -> m_robotIntake.setAntiGravity(), m_robotIntake))
+    // .andThen(Commands.runOnce(() -> m_robotElevator.setSetpointButton(elevatorSetpoint), m_robotElevator))
+    // .andThen(Commands.run(() -> m_robotElevator.gotoPosition(), m_robotElevator).until(() -> m_robotElevator.PIDAtGoal()))
+    // .andThen(Commands.runOnce(() -> m_robotElevator.setAntiGravity(), m_robotElevator))
+    // .andThen(Commands.runOnce(() -> m_robotIntake.setSetpointButton(armSetpoint), m_robotIntake))
+    // .andThen(Commands.run(() -> m_robotIntake.gotoPosition(), m_robotIntake).until(() -> m_robotIntake.PIDAtGoal()))
+    // // .andThen(Commands.runOnce(() -> m_robotIntake.setAntiGravity(), m_robotIntake));
   }
 
   /**
@@ -119,7 +119,7 @@ public class RobotContainer {
     // m_operatorController.axisLessTHan(1, 0.1).onTrue(Commands.runOnce(() -> m_robotElevator.RunElevator(-1)));
     m_operatorController.axisMagnitudeGreaterThan(1, 0.1).whileTrue(Commands.run(() -> m_robotElevator.RunElevator(-m_operatorController.getLeftY())));
     //m_operatorController.axisMagnitudeGreaterThan(1, 0.1).onTrue(Commands.runOnce(() -> m_robotElevator.RunElevator(0)));
-    m_operatorController.axisMagnitudeGreaterThan(1, 0.1).onFalse(Commands.runOnce(() -> m_robotElevator.RunElevator(0)).andThen(()->m_robotElevator.setAntiGravity()).andThen(Commands.run(() -> m_robotElevator.calculatePIDFineTune(), m_robotElevator)));
+    m_operatorController.axisMagnitudeGreaterThan(1, 0.1).onFalse(Commands.runOnce(() -> m_robotElevator.setAntiGravity()));
     // m_operatorController.axisMagnitudeGreaterThan(1, 0.1).whileTrue(Commands.run(() -> m_robotElevator.RunElevator(m_operatorController.getLeftY())));
     // m_operatorController.axisMagnitudeGreaterThan(1, 0.1).onFalse(Commands.runOnce(() -> m_robotElevator.RunElevator(0)));
     
@@ -134,9 +134,9 @@ public class RobotContainer {
 
     m_operatorController.axisMagnitudeGreaterThan(5, 0.2).whileTrue(Commands.run(() -> m_robotIntake.RunArm(-m_operatorController.getRightY() * 0.2)));
     //m_operatorController.axisMagnitudeGreaterThan(1, 0.1).onTrue(Commands.runOnce(() -> m_robotElevator.RunElevator(0)));
-    m_operatorController.axisMagnitudeGreaterThan(5, 0.2).onFalse(Commands.runOnce(() -> m_robotIntake.RunArm(0)).andThen(Commands.run(() -> m_robotIntake.calculatePIDFineTune(), m_robotIntake)));
+    m_operatorController.axisMagnitudeGreaterThan(5, 0.2).onFalse(Commands.runOnce(() -> m_robotIntake.RunArm(0)));
 
-    m_operatorController.leftBumper().onTrue(Commands.runOnce(() -> m_robotIntake.RunIntake(1)));
+    m_operatorController.leftBumper().onTrue(Commands.runOnce(() -> m_robotIntake.RunIntake(.85)));
     //m_operatorController.rightBumper().onTrue(Commands.runOnce(() ->, null));
     m_operatorController.leftBumper().onFalse(Commands.runOnce(() -> m_robotIntake.RunIntake(0)));
     m_operatorController.leftTrigger().onTrue(Commands.runOnce(() -> m_robotIntake.RunIntake(-1)));
@@ -151,198 +151,181 @@ public class RobotContainer {
 
       // m_operatorController.b().onTrue(Commands.run(() -> m_robotElevator.gotoPosition()).until(()->m_robotElevator.PIDAtGoal()).andThen(Commands.runOnce(()->m_robotElevator.setAntiGravity(), m_robotElevator)));
 
-    m_operatorStation.button(SetPointConstants.kProcessorSetpointButton).onTrue(
-      //Safety (set arm straight out)
-      Commands.runOnce(() -> m_robotIntake.setSetpointButton(SetPointConstants.kArmOutSetpoint))
-      .andThen(
-        Commands.run(() -> m_robotIntake.gotoPosition(), m_robotIntake).until(() -> m_robotIntake.PIDAtGoal())
-        .andThen(
-          Commands.runOnce(() -> m_robotIntake.setAntiGravity(), m_robotIntake)
-        )
-        .andThen(
-          Commands.runOnce(() -> m_robotElevator.setSetpointButton(SetPointConstants.kElevatorProcessorSetpoint), m_robotElevator))
-          .andThen(
-            Commands.run(() -> m_robotElevator.gotoPosition(), m_robotElevator).until(() -> m_robotElevator.PIDAtGoal()))
-             .andThen(
-              Commands.runOnce(() -> m_robotElevator.setAntiGravity(), m_robotElevator)
-             )
-             .andThen(
-              Commands.runOnce(() -> m_robotIntake.setSetpointButton(SetPointConstants.kArmProcessorSetpoint), m_robotElevator))
-              .andThen(
-                Commands.run(() -> m_robotIntake.gotoPosition(), m_robotIntake).until(() -> m_robotIntake.PIDAtGoal()))
-                .andThen(
-                  Commands.runOnce(() -> m_robotIntake.setAntiGravity(), m_robotIntake)
-                )
-        )
-      );
-      m_operatorStation.button(SetPointConstants.kAlgaeOnFloorSetpointButton).onTrue(
-      //Safety (set arm straight out)
-      Commands.runOnce(() -> m_robotIntake.setSetpointButton(SetPointConstants.kArmOutSetpoint))
-      .andThen(
-        Commands.run(() -> m_robotIntake.gotoPosition(), m_robotIntake).until(() -> m_robotIntake.PIDAtGoal())
-        .andThen(
-          Commands.runOnce(() -> m_robotIntake.setAntiGravity(), m_robotIntake)
-        )
-        .andThen(
-          Commands.runOnce(() -> m_robotElevator.setSetpointButton(SetPointConstants.kElevatorFloorSetpoint), m_robotElevator))
-          .andThen(
-            Commands.run(() -> m_robotElevator.gotoPosition(), m_robotElevator).until(() -> m_robotElevator.PIDAtGoal()))
-             .andThen(
-              Commands.runOnce(() -> m_robotElevator.setAntiGravity(), m_robotElevator)
-             )
-             .andThen(
-              Commands.runOnce(() -> m_robotIntake.setSetpointButton(SetPointConstants.kArmFloorSetpoint), m_robotElevator))
-              .andThen(
-                Commands.run(() -> m_robotIntake.gotoPosition(), m_robotIntake).until(() -> m_robotIntake.PIDAtGoal()))
-                .andThen(
-                  Commands.runOnce(() -> m_robotIntake.setAntiGravity(), m_robotIntake)
-                )
-        )
-      );
-      m_operatorStation.button(SetPointConstants.kAlgaeOnCoralSetpointButton).onTrue(
-          //Safety (set arm straight out)
-          Commands.runOnce(() -> m_robotIntake.setSetpointButton(SetPointConstants.kArmOutSetpoint))
-          .andThen(
-            Commands.run(() -> m_robotIntake.gotoPosition(), m_robotIntake).until(() -> m_robotIntake.PIDAtGoal())
-            .andThen(
-              Commands.runOnce(() -> m_robotIntake.setAntiGravity(), m_robotIntake)
-            )
-            .andThen(
-              Commands.runOnce(() -> m_robotElevator.setSetpointButton(SetPointConstants.kElevatorAlgaeOnCoralSetpoint), m_robotElevator))
-              .andThen(
-                Commands.run(() -> m_robotElevator.gotoPosition(), m_robotElevator).until(() -> m_robotElevator.PIDAtGoal()))
-                 .andThen(
-                  Commands.runOnce(() -> m_robotElevator.setAntiGravity(), m_robotElevator)
-                 )
-                 .andThen(
-                  Commands.runOnce(() -> m_robotIntake.setSetpointButton(SetPointConstants.kArmAlgaeOnCoralSetpoint), m_robotElevator))
-                  .andThen(
-                    Commands.run(() -> m_robotIntake.gotoPosition(), m_robotIntake).until(() -> m_robotIntake.PIDAtGoal()))
-                    .andThen(
-                      Commands.runOnce(() -> m_robotIntake.setAntiGravity(), m_robotIntake)
-                    )
-            )
-          );
-          m_operatorStation.button(SetPointConstants.kL2SetpointButton).onTrue(
-            //Safety (set arm straight out)
-            Commands.runOnce(() -> m_robotIntake.setSetpointButton(SetPointConstants.kArmOutSetpoint))
-            .andThen(
-              Commands.run(() -> m_robotIntake.gotoPosition(), m_robotIntake).until(() -> m_robotIntake.PIDAtGoal())
-              .andThen(
-                Commands.runOnce(() -> m_robotIntake.setAntiGravity(), m_robotIntake)
-              )
-              .andThen(
-                Commands.runOnce(() -> m_robotElevator.setSetpointButton(SetPointConstants.kElevatorL2Setpoint), m_robotElevator))
-                .andThen(
-                  Commands.run(() -> m_robotElevator.gotoPosition(), m_robotElevator).until(() -> m_robotElevator.PIDAtGoal()))
-                   .andThen(
-                    Commands.runOnce(() -> m_robotElevator.setAntiGravity(), m_robotElevator)
-                   )
-                   .andThen(
-                    Commands.runOnce(() -> m_robotIntake.setSetpointButton(SetPointConstants.kArmL2Setpoint), m_robotElevator))
-                    .andThen(
-                      Commands.run(() -> m_robotIntake.gotoPosition(), m_robotIntake).until(() -> m_robotIntake.PIDAtGoal()))
-                      .andThen(
-                        Commands.runOnce(() -> m_robotIntake.setAntiGravity(), m_robotIntake)
-                      )
-              )
-            );
-            m_operatorStation.button(SetPointConstants.kL3SetpointButton).onTrue(
-              //Safety (set arm straight out)
-              Commands.runOnce(() -> m_robotIntake.setSetpointButton(SetPointConstants.kArmOutSetpoint))
-              .andThen(
-                Commands.run(() -> m_robotIntake.gotoPosition(), m_robotIntake).until(() -> m_robotIntake.PIDAtGoal())
-                .andThen(
-                  Commands.runOnce(() -> m_robotIntake.setAntiGravity(), m_robotIntake)
-                )
-                .andThen(
-                  Commands.runOnce(() -> m_robotElevator.setSetpointButton(SetPointConstants.kElevatorL3Setpoint), m_robotElevator))
-                  .andThen(
-                    Commands.run(() -> m_robotElevator.gotoPosition(), m_robotElevator).until(() -> m_robotElevator.PIDAtGoal()))
-                     .andThen(
-                      Commands.runOnce(() -> m_robotElevator.setAntiGravity(), m_robotElevator)
-                     )
-                     .andThen(
-                      Commands.runOnce(() -> m_robotIntake.setSetpointButton(SetPointConstants.kArmL3Setpoint), m_robotElevator))
-                      .andThen(
-                        Commands.run(() -> m_robotIntake.gotoPosition(), m_robotIntake).until(() -> m_robotIntake.PIDAtGoal()))
-                        .andThen(
-                          Commands.runOnce(() -> m_robotIntake.setAntiGravity(), m_robotIntake)
-                        )
-                )
-              );
-              m_operatorStation.button(SetPointConstants.kBargeForwardSetpointButton).onTrue(
-                //Safety (set arm straight out)
-                Commands.runOnce(() -> m_robotIntake.setSetpointButton(SetPointConstants.kArmOutSetpoint))
-                .andThen(
-                  Commands.run(() -> m_robotIntake.gotoPosition(), m_robotIntake).until(() -> m_robotIntake.PIDAtGoal())
-                  .andThen(
-                    Commands.runOnce(() -> m_robotIntake.setAntiGravity(), m_robotIntake)
-                  )
-                  .andThen(
-                    Commands.runOnce(() -> m_robotElevator.setSetpointButton(SetPointConstants.kElevatorBargeForwardSetpoint), m_robotElevator))
-                    .andThen(
-                      Commands.run(() -> m_robotElevator.gotoPosition(), m_robotElevator).until(() -> m_robotElevator.PIDAtGoal()))
-                       .andThen(
-                        Commands.runOnce(() -> m_robotElevator.setAntiGravity(), m_robotElevator)
-                       )
-                       .andThen(
-                        Commands.runOnce(() -> m_robotIntake.setSetpointButton(SetPointConstants.kArmBargeForwardSetpoint), m_robotElevator))
-                        .andThen(
-                          Commands.run(() -> m_robotIntake.gotoPosition(), m_robotIntake).until(() -> m_robotIntake.PIDAtGoal()))
-                          .andThen(
-                            Commands.runOnce(() -> m_robotIntake.setAntiGravity(), m_robotIntake)
-                          )
-                  )
-                );
-                m_operatorStation.button(SetPointConstants.kBargeBackwardSetpointButton).onTrue(
-                  //Safety (set arm straight out)
-                  Commands.runOnce(() -> m_robotIntake.setSetpointButton(SetPointConstants.kArmOutSetpoint))
-                  .andThen(
-                    Commands.run(() -> m_robotIntake.gotoPosition(), m_robotIntake).until(() -> m_robotIntake.PIDAtGoal())
-                    .andThen(
-                      Commands.runOnce(() -> m_robotIntake.setAntiGravity(), m_robotIntake)
-                    )
-                    .andThen(
-                      Commands.runOnce(() -> m_robotElevator.setSetpointButton(SetPointConstants.kElevatorBargeBackwardSetpoint), m_robotElevator))
-                      .andThen(
-                        Commands.run(() -> m_robotElevator.gotoPosition(), m_robotElevator).until(() -> m_robotElevator.PIDAtGoal()))
-                         .andThen(
-                          Commands.runOnce(() -> m_robotElevator.setAntiGravity(), m_robotElevator)
-                         )
-                         .andThen(
-                          Commands.runOnce(() -> m_robotIntake.setSetpointButton(SetPointConstants.kArmBargeBackwardSetpoint), m_robotElevator))
-                          .andThen(
-                            Commands.run(() -> m_robotIntake.gotoPosition(), m_robotIntake).until(() -> m_robotIntake.PIDAtGoal()))
-                            .andThen(
-                              Commands.runOnce(() -> m_robotIntake.setAntiGravity(), m_robotIntake)
-                            )
-                    )
-                  );
-                  m_operatorStation.button(SetPointConstants.kHomePositionButton).onTrue(
-                    //Safety (set arm straight out)
-                    Commands.runOnce(() -> m_robotIntake.setSetpointButton(SetPointConstants.kArmOutSetpoint))
-                    .andThen(
-                      Commands.run(() -> m_robotIntake.gotoPosition(), m_robotIntake).until(() -> m_robotIntake.PIDAtGoal())
-                      .andThen(
-                        Commands.runOnce(() -> m_robotIntake.setAntiGravity(), m_robotIntake)
-                      )
-                      .andThen(
-                        Commands.runOnce(() -> m_robotElevator.setSetpointButton(SetPointConstants.kElevatorHomePositionSetpoint), m_robotElevator))
-                        .andThen(
-                          Commands.run(() -> m_robotElevator.gotoPosition(), m_robotElevator).until(() -> m_robotElevator.PIDAtGoal()))
-                           .andThen(
-                            Commands.runOnce(() -> m_robotElevator.setAntiGravity(), m_robotElevator)
-                           )
-                           .andThen(
-                            Commands.runOnce(() -> m_robotIntake.setSetpointButton(SetPointConstants.kElevatorHomePositionSetpoint), m_robotElevator))
-                            .andThen(
-                              Commands.run(() -> m_robotIntake.gotoPosition(), m_robotIntake).until(() -> m_robotIntake.PIDAtGoal()))
-                              .andThen(
-                                Commands.runOnce(() -> m_robotIntake.setAntiGravity(), m_robotIntake)
-                              )
-                      )
-                    );
+    // m_operatorStation.button(SetPointConstants.kAlgaeOnFloorSetpointButton).onTrue(
+    //   //Safety (set arm straight out)
+    //   Commands.run(() -> m_robotIntake.setSetpointButton(SetPointConstants.kArmFloorSetpoint))
+    //   );
+    // m_operatorStation.button(SetPointConstants.kBargeBackwardSetpointButton).onTrue(
+    //     Commands.run(() -> m_robotIntake.setSetpointButton(SetPointConstants.kArmBargeBackwardSetpoint))
+    //   );
+    //   m_operatorStation.button(SetPointConstants.kAlgaeOnFloorSetpointButton).onTrue(
+    //   //Safety (set arm straight out)
+    //   Commands.runOnce(() -> m_robotIntake.setSetpointButton(SetPointConstants.kArmOutSetpoint))
+    //   .andThen(
+    //     Commands.run(() -> m_robotIntake.gotoPosition(), m_robotIntake).until(() -> m_robotIntake.PIDAtGoal())
+    //     .andThen(
+    //       Commands.runOnce(() -> m_robotIntake.setAntiGravity(), m_robotIntake)
+    //     )
+    //     .andThen(
+    //       Commands.runOnce(() -> m_robotElevator.setSetpointButton(SetPointConstants.kElevatorFloorSetpoint), m_robotElevator))
+    //       .andThen(
+    //         Commands.run(() -> m_robotElevator.gotoPosition(), m_robotElevator).until(() -> m_robotElevator.PIDAtGoal()))
+    //          .andThen(
+    //           Commands.runOnce(() -> m_robotElevator.setAntiGravity(), m_robotElevator)
+    //          )
+    //          .andThen(
+    //           Commands.runOnce(() -> m_robotIntake.setSetpointButton(SetPointConstants.kArmFloorSetpoint), m_robotElevator))
+    //           .andThen(
+    //             Commands.run(() -> m_robotIntake.gotoPosition(), m_robotIntake).until(() -> m_robotIntake.PIDAtGoal()))
+    //             .andThen(
+    //               Commands.runOnce(() -> m_robotIntake.setAntiGravity(), m_robotIntake)
+    //             )
+    //     )
+    //   );
+    //   m_operatorStation.button(SetPointConstants.kAlgaeOnCoralSetpointButton).onTrue(
+    //       //Safety (set arm straight out)
+    //       Commands.runOnce(() -> m_robotIntake.setSetpointButton(SetPointConstants.kArmOutSetpoint))
+    //       .andThen(
+    //         Commands.run(() -> m_robotIntake.gotoPosition(), m_robotIntake).until(() -> m_robotIntake.PIDAtGoal())
+    //         .andThen(
+    //           Commands.runOnce(() -> m_robotIntake.setAntiGravity(), m_robotIntake)
+    //         )
+    //         .andThen(
+    //           Commands.runOnce(() -> m_robotElevator.setSetpointButton(SetPointConstants.kElevatorAlgaeOnCoralSetpoint), m_robotElevator))
+    //           .andThen(
+    //             Commands.run(() -> m_robotElevator.gotoPosition(), m_robotElevator).until(() -> m_robotElevator.PIDAtGoal()))
+    //              .andThen(
+    //               Commands.runOnce(() -> m_robotElevator.setAntiGravity(), m_robotElevator)
+    //              )
+    //              .andThen(
+    //               Commands.runOnce(() -> m_robotIntake.setSetpointButton(SetPointConstants.kArmAlgaeOnCoralSetpoint), m_robotElevator))
+    //               .andThen(
+    //                 Commands.run(() -> m_robotIntake.gotoPosition(), m_robotIntake).until(() -> m_robotIntake.PIDAtGoal()))
+    //                 .andThen(
+    //                   Commands.runOnce(() -> m_robotIntake.setAntiGravity(), m_robotIntake)
+    //                 )
+    //         )
+    //       );
+    //       m_operatorStation.button(SetPointConstants.kL2SetpointButton).onTrue(
+    //         //Safety (set arm straight out)
+    //         Commands.runOnce(() -> m_robotIntake.setSetpointButton(SetPointConstants.kArmOutSetpoint))
+    //         .andThen(
+    //           Commands.run(() -> m_robotIntake.gotoPosition(), m_robotIntake).until(() -> m_robotIntake.PIDAtGoal())
+    //           .andThen(
+    //             Commands.runOnce(() -> m_robotIntake.setAntiGravity(), m_robotIntake)
+    //           )
+    //           .andThen(
+    //             Commands.runOnce(() -> m_robotElevator.setSetpointButton(SetPointConstants.kElevatorL2Setpoint), m_robotElevator))
+    //             .andThen(
+    //               Commands.run(() -> m_robotElevator.gotoPosition(), m_robotElevator).until(() -> m_robotElevator.PIDAtGoal()))
+    //                .andThen(
+    //                 Commands.runOnce(() -> m_robotElevator.setAntiGravity(), m_robotElevator)
+    //                )
+    //                .andThen(
+    //                 Commands.runOnce(() -> m_robotIntake.setSetpointButton(SetPointConstants.kArmL2Setpoint), m_robotElevator))
+    //                 .andThen(
+    //                   Commands.run(() -> m_robotIntake.gotoPosition(), m_robotIntake).until(() -> m_robotIntake.PIDAtGoal()))
+    //                   .andThen(
+    //                     Commands.runOnce(() -> m_robotIntake.setAntiGravity(), m_robotIntake)
+    //                   )
+    //           )
+    //         );
+    //         m_operatorStation.button(SetPointConstants.kL3SetpointButton).onTrue(
+    //           //Safety (set arm straight out)
+    //           Commands.runOnce(() -> m_robotIntake.setSetpointButton(SetPointConstants.kArmOutSetpoint))
+    //           .andThen(
+    //             Commands.run(() -> m_robotIntake.gotoPosition(), m_robotIntake).until(() -> m_robotIntake.PIDAtGoal())
+    //             .andThen(
+    //               Commands.runOnce(() -> m_robotIntake.setAntiGravity(), m_robotIntake)
+    //             )
+    //             .andThen(
+    //               Commands.runOnce(() -> m_robotElevator.setSetpointButton(SetPointConstants.kElevatorL3Setpoint), m_robotElevator))
+    //               .andThen(
+    //                 Commands.run(() -> m_robotElevator.gotoPosition(), m_robotElevator).until(() -> m_robotElevator.PIDAtGoal()))
+    //                  .andThen(
+    //                   Commands.runOnce(() -> m_robotElevator.setAntiGravity(), m_robotElevator)
+    //                  )
+    //                  .andThen(
+    //                   Commands.runOnce(() -> m_robotIntake.setSetpointButton(SetPointConstants.kArmL3Setpoint), m_robotElevator))
+    //                   .andThen(
+    //                     Commands.run(() -> m_robotIntake.gotoPosition(), m_robotIntake).until(() -> m_robotIntake.PIDAtGoal()))
+    //                     .andThen(
+    //                       Commands.runOnce(() -> m_robotIntake.setAntiGravity(), m_robotIntake)
+    //                     )
+    //             )
+    //           );
+    //           m_operatorStation.button(SetPointConstants.kBargeForwardSetpointButton).onTrue(
+    //             //Safety (set arm straight out)
+    //             Commands.runOnce(() -> m_robotIntake.setSetpointButton(SetPointConstants.kArmOutSetpoint))
+    //             .andThen(
+    //               Commands.run(() -> m_robotIntake.gotoPosition(), m_robotIntake).until(() -> m_robotIntake.PIDAtGoal())
+    //               .andThen(
+    //                 Commands.runOnce(() -> m_robotIntake.setAntiGravity(), m_robotIntake)
+    //               )
+    //               .andThen(
+    //                 Commands.runOnce(() -> m_robotElevator.setSetpointButton(SetPointConstants.kElevatorBargeForwardSetpoint), m_robotElevator))
+    //                 .andThen(
+    //                   Commands.run(() -> m_robotElevator.gotoPosition(), m_robotElevator).until(() -> m_robotElevator.PIDAtGoal()))
+    //                    .andThen(
+    //                     Commands.runOnce(() -> m_robotElevator.setAntiGravity(), m_robotElevator)
+    //                    )
+    //                    .andThen(
+    //                     Commands.runOnce(() -> m_robotIntake.setSetpointButton(SetPointConstants.kArmBargeForwardSetpoint), m_robotElevator))
+    //                     .andThen(
+    //                       Commands.run(() -> m_robotIntake.gotoPosition(), m_robotIntake).until(() -> m_robotIntake.PIDAtGoal()))
+    //                       .andThen(
+    //                         Commands.runOnce(() -> m_robotIntake.setAntiGravity(), m_robotIntake)
+    //                       )
+    //               )
+    //             );
+    //             m_operatorStation.button(SetPointConstants.kBargeBackwardSetpointButton).onTrue(
+    //               //Safety (set arm straight out)
+    //               Commands.runOnce(() -> m_robotIntake.setSetpointButton(SetPointConstants.kArmOutSetpoint))
+    //               .andThen(
+    //                 Commands.run(() -> m_robotIntake.gotoPosition(), m_robotIntake).until(() -> m_robotIntake.PIDAtGoal())
+    //                 .andThen(
+    //                   Commands.runOnce(() -> m_robotIntake.setAntiGravity(), m_robotIntake)
+    //                 )
+    //                 .andThen(
+    //                   Commands.runOnce(() -> m_robotElevator.setSetpointButton(SetPointConstants.kElevatorBargeBackwardSetpoint), m_robotElevator))
+    //                   .andThen(
+    //                     Commands.run(() -> m_robotElevator.gotoPosition(), m_robotElevator).until(() -> m_robotElevator.PIDAtGoal()))
+    //                      .andThen(
+    //                       Commands.runOnce(() -> m_robotElevator.setAntiGravity(), m_robotElevator)
+    //                      )
+    //                      .andThen(
+    //                       Commands.runOnce(() -> m_robotIntake.setSetpointButton(SetPointConstants.kArmBargeBackwardSetpoint), m_robotElevator))
+    //                       .andThen(
+    //                         Commands.run(() -> m_robotIntake.gotoPosition(), m_robotIntake).until(() -> m_robotIntake.PIDAtGoal()))
+    //                         .andThen(
+    //                           Commands.runOnce(() -> m_robotIntake.setAntiGravity(), m_robotIntake)
+    //                         )
+    //                 )
+    //               );
+    //               m_operatorStation.button(SetPointConstants.kHomePositionButton).onTrue(
+    //                 //Safety (set arm straight out)
+    //                 Commands.runOnce(() -> m_robotIntake.setSetpointButton(SetPointConstants.kArmOutSetpoint))
+    //                 .andThen(
+    //                   Commands.run(() -> m_robotIntake.gotoPosition(), m_robotIntake).until(() -> m_robotIntake.PIDAtGoal())
+    //                   .andThen(
+    //                     Commands.runOnce(() -> m_robotIntake.setAntiGravity(), m_robotIntake)
+    //                   )
+    //                   .andThen(
+    //                     Commands.runOnce(() -> m_robotElevator.setSetpointButton(SetPointConstants.kElevatorHomePositionSetpoint), m_robotElevator))
+    //                     .andThen(
+    //                       Commands.run(() -> m_robotElevator.gotoPosition(), m_robotElevator).until(() -> m_robotElevator.PIDAtGoal()))
+    //                        .andThen(
+    //                         Commands.runOnce(() -> m_robotElevator.setAntiGravity(), m_robotElevator)
+    //                        )
+    //                        .andThen(
+    //                         Commands.runOnce(() -> m_robotIntake.setSetpointButton(SetPointConstants.kElevatorHomePositionSetpoint), m_robotElevator))
+    //                         .andThen(
+    //                           Commands.run(() -> m_robotIntake.gotoPosition(), m_robotIntake).until(() -> m_robotIntake.PIDAtGoal()))
+    //                           .andThen(
+    //                             Commands.runOnce(() -> m_robotIntake.setAntiGravity(), m_robotIntake)
+    //                           )
+    //                   )
+    //                 );
 
     //climber Controls
     m_operatorController.rightBumper().onTrue(Commands.runOnce(() -> m_robotClimber.Climb(1)));

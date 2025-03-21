@@ -141,18 +141,11 @@ public class ElevatorSubsystem extends SubsystemBase{
 
      @Override
      public void periodic() {
-          //elevatorFeedForward.setKa(kV.get().getDouble());
-          //elevatorPID.setP(kV.get().getDouble());
-         // TODO Auto-generated method stub
-
          turns.setDouble(getEleEncoder());
          turnRate.setDouble(getSpeedLeft());
 
          if(m_leftMotor.getReverseLimitSwitch().isPressed()){
           zeroEleEncoder();
           }
-
-     //     if(m_leftMotor.getForwardLimitSwitch().isPressed()){
-     //      }
-          }
      }
+ }

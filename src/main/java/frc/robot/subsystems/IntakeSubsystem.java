@@ -1,9 +1,11 @@
 package frc.robot.subsystems;
 
+import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.SparkMax;
 
 import frc.robot.Constants.OIConstants;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
+import com.revrobotics.RelativeEncoder;
 
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
@@ -18,21 +20,22 @@ import frc.robot.Constants.ArmConstants;
 public class IntakeSubsystem extends SubsystemBase{
      ShuffleboardTab intakeTestingTab = Shuffleboard.getTab("IntakeTestingTab");
      GenericEntry encoderReadout;
-     GenericEntry kP, kV, SetPoint, instantVelocity, Eq1, kA, kD, kG, kI;
+     GenericEntry kP, kV, SetPoint, instantVelocity, Eq1, kA, kD, kG, kI, setVoltage;
 
           private ArmFeedforward armFeedForward = new ArmFeedforward(ArmConstants.kS, ArmConstants.kG,
           ArmConstants.kV, ArmConstants.kA);
      private ProfiledPIDController armPID = new ProfiledPIDController(ArmConstants.kP, ArmConstants.kI, ArmConstants.kD, new TrapezoidProfile.Constraints(
-              40,
-              40));
+              20,
+              20));
 
      private final SparkMax m_armMotorLeft = new SparkMax(OIConstants.kArmCanIDLeft, MotorType.kBrushless);
      // private final SparkMax m_armMotorRight = new SparkMax(OIConstants.kArmCanIDRight, MotorType.kBrushed); //Unused
      private final SparkMax m_intakeMotorLeft = new SparkMax(OIConstants.kIntakeCanIDLeft, MotorType.kBrushless);
      private final SparkMax m_intakeMotorRight = new SparkMax(OIConstants.kIntakeCanIDRight, MotorType.kBrushless);
-     private double encoderOffset;
+     private double encoderOffset = 2.094;
      public double voltage;
-
+     public double condom;
+     
      public void RunArm(double polarity){
                m_armMotorLeft.set(polarity);
      }
@@ -44,7 +47,7 @@ public class IntakeSubsystem extends SubsystemBase{
    }
 
      public double getArmEncoder(){
-          return m_armMotorLeft.getEncoder().getPosition() - encoderOffset;
+          return m_armMotorLeft.getAlternateEncoder().getPosition() * 6.2832 + encoderOffset;
      }
 
      public double getArmAbsoluteEncoder(){
@@ -57,52 +60,46 @@ public class IntakeSubsystem extends SubsystemBase{
 
      //setpoints are commented out nwo 🔴🔴🔴🔴🔴🔴🔴🔴🔴🔴🔴🔴🔴
      public void gotoPosition(){
-          // armPID.setGoal(SetPoint.get().getDouble());
-          // armPID.setI(kD.get().getDouble());
-          // armPID.setD(kI.get().getDouble());
           calculatePID();
           m_armMotorLeft.setVoltage(voltage);
           instantVelocity.setDouble(voltage);
      }
 
      public void calculatePID(){
-          voltage =  armPID.calculate(getArmEncoder()) + armFeedForward.calculate(armPID.getSetpoint().position,armPID.getSetpoint().velocity) + (CalculateKG() * 0.75);
+          voltage = armPID.calculate(getArmEncoder()) + armFeedForward.calculate(armPID.getSetpoint().position,armPID.getSetpoint().velocity);
      }
 
-     public void calculatePIDFineTune(){
-          armPID.setGoal(getArmEncoder());
-          voltage =  armPID.calculate(getArmEncoder()) + armFeedForward.calculate(armPID.getSetpoint().position,armPID.getSetpoint().velocity) + (CalculateKG() * 0.75);
+     public void RunPIDOnStartup(){
+          condom = armPID.calculate(getArmEncoder()) + armFeedForward.calculate(armPID.getSetpoint().position,armPID.getSetpoint().velocity);
      }
 
-     public void calculatePIDwithSetpoint(){
-          voltage =  armPID.calculate(getArmEncoder()) + armFeedForward.calculate(armPID.getSetpoint().position,armPID.getSetpoint().velocity) + (CalculateKG() * 0.75);
-     }
-     public void setAntiGravity(){
-          m_armMotorLeft.setVoltage(CalculateKG());
-     }
+     // public void setAntiGravity(){
+     //      m_armMotorLeft.setVoltage(armFeedForward.getKg());
+     // }
+
      public void setAntiGravityOff(){
           m_armMotorLeft.set(0);
      }
 
-     public double CalculateKG(){
-          //Uses 4 peicewise equations depending on gravity on the arm
-          if(getArmEncoder() < -99 || (getArmEncoder() > -99 && getArmEncoder() < -77)){
-               return .33;
-          }
-          if(getArmEncoder() > -77 && getArmEncoder() < -57){
-               return .36;
-          }
-          if(getArmEncoder() > -57 && getArmEncoder() < -37){
-               return .33;
-          }
-          if(getArmEncoder() > -37 && getArmEncoder() < -17){
-               return .28;
-          }
-          if(getArmEncoder() > 0 || (getArmEncoder() > -17 && getArmEncoder() < 0)){
-               return .15;          
-          }
-          return(armFeedForward.getKg());
-     }
+     // public double CalculateKG(){
+     //      //Uses 4 peicewise equations depending on gravity on the arm
+     //      if(getArmEncoder() < -99 || (getArmEncoder() > -99 && getArmEncoder() < -77)){
+     //           return .33;
+     //      }
+     //      if(getArmEncoder() > -77 && getArmEncoder() < -57){
+     //           return .36;
+     //      }
+     //      if(getArmEncoder() > -57 && getArmEncoder() < -37){
+     //           return .33;
+     //      }
+     //      if(getArmEncoder() > -37 && getArmEncoder() < -17){
+     //           return .28;
+     //      }
+     //      if(getArmEncoder() > 0 || (getArmEncoder() > -17 && getArmEncoder() < 0)){
+     //           return .15;          
+     //      }
+     //      return(armFeedForward.getKg());
+     // }
 
      public void setSetpoint(){
           armPID.setGoal(SetPoint.get().getDouble());
@@ -131,16 +128,16 @@ public class IntakeSubsystem extends SubsystemBase{
           kV = intakeTestingTab.add("kV", 0).getEntry(); //20
           kG = intakeTestingTab.add("KG", 0).getEntry();
           kI = intakeTestingTab.add("KI", 0).getEntry();
-          armPID.setTolerance(1);
+          armPID.setTolerance(.1);
+          setVoltage = intakeTestingTab.add("Input Test Voltage", 0).getEntry();
+          RunPIDOnStartup();
      }
 
      @Override
      public void periodic() {
+          armPID.setGoal(SetPoint.get().getDouble());
+          gotoPosition();
           encoderReadout.setDouble(getArmEncoder());
-          // armPID.setD(kD.get().getDouble());
-          // armPID.setP(kP.get().getDouble());
-          // armFeedForward.setKv(kV.get().getDouble());
-          // armFeedForward.setKa(kA.get().getDouble());
      }
 }
 

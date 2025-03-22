@@ -179,35 +179,38 @@ public final class Constants {
   }
 
   public static final class IntakeConstants{
-    public static final int kUpButton = 2;
-    public static final int kDownButton = 1;
-    public static final double kIntakeSpeed = 85;
-    public static final double kArmFineTuneSpeed = .5;
+    public static final double kIntakeSpeed = .8;
+    public static final double kShootSpeed = 1;
     public static final double kIntakeSafeEncoderValue = 0; //TODO
     public static final double kIntakeSafeEncoderValueAdjusted = 0; //TODO
-    public static final double kS = 0, kG = 0, kV = 0, kA = 0, kP = 0, kI = 0, kD = 0; //TODO: Fill in
+    public static final double kIntakePIDCutoffRange = 0.1;
+    public static final  double kS = .125, kG = .225, kV = 4, kA = 2, kP = 3, kI = 0, kD = 0; //kv = .162, kp = .25
 
   }
 
   public static final class SetPointConstants{
     //Driverstation Button -> Setpoint Bindings //TODO
-    public static final int kBargeSetpointButton = 0;
-    public static final int kProcessorSetpointButton = 1;
-    public static final int kL3SetpointButton = 2;
+    public static final int kHomeSetpointButton = 8;
+    public static final int kFloorSetpointButton = 7;
+    public static final int kLollipopSetpointButton = 6; //Alley-Oop!
+    public static final int kProcessorSetpointButton = 5;
+    public static final int kL3SetpointButton = 4;
     public static final int kL2SetpointButton = 3;
-    public static final int kAlgaeOnCoralSetpointButton = 4;
-    public static final int kAlgaeOnFloorSetpointButton = 5;
+    public static final int kBargeForwardSetpointButton = 2;
+    public static final int kBargeBackwardSetpointButton = 1;
 
     //Setpoint Values (Unset)
       //Elevator //TODO
-      public static final double kElevatorBargeSetpoint = 0;
+      public static final double kElevatorBargeForwardSetpoint = 0;
+      public static final double kElevatorBargeBackwardSetpoint = 0; //Alley-Oop!
       public static final double kElevatorProcessorSetpoint = 0;
       public static final double kElevatorL3Setpoint = 0;
       public static final double kElevatorL2Setpoint = 0;
       public static final double kElevatorAlgaeOnCoralSetpoint = 0;
       public static final double kElevatorFloorSetpoint = 0;
        //Arm //TODO
-       public static final double kArmBargeSetpoint = 0;
+       public static final double kArmBargeForwardSetpoint = 0;
+       public static final double kArmBargeBackwardSetpoint = 0; //Alley-Oop!
        public static final double kArmProcessorSetpoint = 0;
        public static final double kArmL3Setpoint = 0;
        public static final double kArmL2Setpoint = 0;

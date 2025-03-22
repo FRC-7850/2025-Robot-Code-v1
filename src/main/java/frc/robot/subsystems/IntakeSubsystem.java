@@ -30,6 +30,7 @@ public class IntakeSubsystem extends SubsystemBase{
      private final SparkMax intakeMotorLeft = new SparkMax(CanIDConstants.kIntakeLeftCanId, MotorType.kBrushless);
      private final SparkMax intakeMotorRight = new SparkMax(CanIDConstants.kIntakeRightCanId, MotorType.kBrushless);
      public double armEncoderOffset;
+     public double setpointReference;
      private ArmFeedforward armFeedForward = new ArmFeedforward(
           IntakeConstants.kS, 
           IntakeConstants.kG,
@@ -49,58 +50,25 @@ public class IntakeSubsystem extends SubsystemBase{
           encoderReadout = intakeTestingTab.add("Setpoint", 0).getEntry();
           encoderReadout = intakeTestingTab.add("Calculated Voltage", 0).getEntry();
 
-          //Initialize
-          // ZeroArmEncoder();
+          //PID nullified on startup
+          SetGoal(getArmEncoder());
      }
 
           //Reference Methods
      //Arm
-     public void ArmFineTune(double speed){     
-          armMotorLeft.set(speed * IntakeConstants.kArmFineTuneSpeed);
-     }
 
      public double getArmEncoder(){
-          return armMotorLeft.getAbsoluteEncoder().getPosition();
+          return armMotorLeft.getAbsoluteEncoder().getPosition() - armEncoderOffset;
      }
-
-          // Unused
-     // public void zeroArmEncoder(){
-     //      armEncoderOffset = armMotorLeft.getEncoder().getPosition();
-     // }
 
      public void SetGoal(double goal){
          armPID.setGoal(goal);
-     }
-
-     public double CalculateKG(){
-          //Uses 4 peicewise equations depending on gravity on the arm (should really be a function)
-          if(getArmEncoder() < -99 || (getArmEncoder() > -99 && getArmEncoder() < -77)){
-               return .33;
-          }
-          if(getArmEncoder() > -77 && getArmEncoder() < -57){
-               return .36;
-          }
-          if(getArmEncoder() > -57 && getArmEncoder() < -37){
-               return .33;
-          }
-          if(getArmEncoder() > -37 && getArmEncoder() < -17){
-               return .28;
-          }
-          if(getArmEncoder() > 0 || (getArmEncoder() > -17 && getArmEncoder() < 0)){
-               return .15;          
-          }
-          //Fallback
-          return(armFeedForward.getKg());
-     }
-
-     public void setAntiGravity(){
-          armMotorLeft.setVoltage(CalculateKG());
+         setpointReference = goal;
      }
 
      public double calculatePID(){
           return armPID.calculate(getArmEncoder()) + 
-          armFeedForward.calculate(armPID.getSetpoint().position,armPID.getSetpoint().velocity) 
-          + (CalculateKG()); //Initially multiplied by 0.75 when copied into branch
+          armFeedForward.calculate(armPID.getSetpoint().position,armPID.getSetpoint().velocity);
      }
 
      public void gotoPosition(){
@@ -109,8 +77,8 @@ public class IntakeSubsystem extends SubsystemBase{
           calculatedVoltage.setDouble(voltage);
      }
 
-     public boolean AtGoal(double setpoint){
-          if(getArmEncoder() > (setpoint + 5) || getArmEncoder() < (setpoint + 5)){
+     public boolean AtGoal(){
+          if(getArmEncoder() > (setpointReference + IntakeConstants.kIntakePIDCutoffRange) || getArmEncoder() < (setpointReference - IntakeConstants.kIntakePIDCutoffRange)){
                return true;
           }
           return false;
@@ -119,11 +87,13 @@ public class IntakeSubsystem extends SubsystemBase{
 
      //Intake
      public void Shoot(){       
-
+          intakeMotorRight.set(-1);
+          intakeMotorLeft.set(1);
      }
 
      public void Intake(){       
-
+          intakeMotorRight.set(1);
+          intakeMotorLeft.set(-1);
      }
 
      public void GetIntakeCurrent(){       
@@ -134,5 +104,8 @@ public class IntakeSubsystem extends SubsystemBase{
      public void periodic() {
           //Shuffleboard Update
           encoderReadout.setDouble(getArmEncoder());
+
+          //Run PID
+          gotoPosition();
      }
 }

@@ -6,10 +6,7 @@
  package frc.robot;
 
 //WPILib
- import edu.wpi.first.wpilibj2.command.Command;
  import edu.wpi.first.wpilibj2.command.Commands;
- import edu.wpi.first.wpilibj2.command.InstantCommand;
- import edu.wpi.first.wpilibj2.command.RunCommand;
  import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
     //File structure
@@ -20,7 +17,6 @@
  import frc.robot.subsystems.ClimbSubsystem;
  //Constants
  import frc.robot.Constants.NeoMotorConstants;
- import frc.robot.Constants.SetPointConstants;
  import frc.robot.Constants.IntakeConstants;
 
  public class CommandController extends SubsystemBase{
@@ -36,20 +32,27 @@
     }
 
     //Reference Methods
-    public Command Path(){
+    // public Command Path(){
 
-    }
+    // }
 
-    public Command CancelPath(){
+    // public Command CancelPath(){
 
-    }
+    // }
 
+    /**
+     * Run Arm and Elevator PID, with safety mechanisms. 
+     * @param intakeSetpoint double, (from constants)
+     * @param elevatorSetpoint double, (from constants)
+     */
     public void PIDSuperCommand(double intakeSetpoint, double elevatorSetpoint){
         //Initial safety arm PID with intentional overshoot.
         if (intakeSubsystem.getArmEncoder() > IntakeConstants.kIntakeSafeEncoderValue){
-            Commands.runOnce(() -> intakeSubsystem.SetGoal(IntakeConstants.kIntakeSafeEncoderValueAdjusted), intakeSubsystem).andThen
-            (Commands.run(() -> intakeSubsystem.gotoPosition(), intakeSubsystem)).until(() -> intakeSubsystem.AtGoal(intakeSetpoint)).andThen
-            (Commands.runOnce(() -> intakeSubsystem.setAntiGravity(), intakeSubsystem));
+            Commands.sequence(
+                Commands.runOnce(() -> intakeSubsystem.SetGoal(IntakeConstants.kIntakeSafeEncoderValueAdjusted), intakeSubsystem),
+                //Idle to ensure command can't end until arm has reached goal
+                Commands.idle(intakeSubsystem)
+                .until(() -> intakeSubsystem.AtGoal()));
         }
         
         /* Either the arm's setpoint is within the safe range, or it's outside. In either case, the elevator can
@@ -58,47 +61,30 @@
         */
         if (intakeSetpoint < IntakeConstants.kIntakeSafeEncoderValue){
             //Within safe zone
-            Commands.runOnce(() -> intakeSubsystem.SetGoal(intakeSetpoint), intakeSubsystem).alongWith
-            (Commands.runOnce(() -> elevatorSubsystem.SetGoal(elevatorSetpoint), elevatorSubsystem)).andThen
-            (Commands.run(() -> intakeSubsystem.gotoPosition(), intakeSubsystem)).until(() -> intakeSubsystem.AtGoal(intakeSetpoint)).alongWith
-            (Commands.run(() -> elevatorSubsystem.gotoPosition(), elevatorSubsystem)).until(() -> elevatorSubsystem.atGoal()).andThen
-            (Commands.runOnce(() -> elevatorSubsystem.setAntiGravity(), elevatorSubsystem)).alongWith
-            (Commands.runOnce(() -> elevatorSubsystem.setAntiGravity(), elevatorSubsystem));
+            Commands.race(
+                Commands.runOnce(() -> intakeSubsystem.SetGoal(intakeSetpoint), intakeSubsystem),
+                Commands.runOnce(() -> elevatorSubsystem.SetGoal(elevatorSetpoint), elevatorSubsystem)
+            );
         }else{
-            //Outside safe zone
-            Commands.runOnce(() -> intakeSubsystem.SetGoal(intakeSetpoint), intakeSubsystem).alongWith
-            (Commands.runOnce(() -> elevatorSubsystem.SetGoal(elevatorSetpoint), elevatorSubsystem)).andThen
-            (Commands.run(() -> elevatorSubsystem.gotoPosition(), elevatorSubsystem)).until(() -> elevatorSubsystem.atGoal()).andThen
-            (Commands.run(() -> intakeSubsystem.gotoPosition(), intakeSubsystem)).until(() -> intakeSubsystem.AtGoal(intakeSetpoint)).andThen
-            (Commands.runOnce(() -> elevatorSubsystem.setAntiGravity(), elevatorSubsystem)).alongWith
-            (Commands.runOnce(() -> elevatorSubsystem.setAntiGravity(), elevatorSubsystem));
+            Commands.sequence(
+                Commands.runOnce(() -> elevatorSubsystem.SetGoal(elevatorSetpoint), elevatorSubsystem),
+                //Idle to ensure command can't end until arm has reached goal
+                Commands.idle(elevatorSubsystem)
+                .until(() -> elevatorSubsystem.AtGoal()),
+                Commands.runOnce(() -> intakeSubsystem.SetGoal(intakeSetpoint), intakeSubsystem)
+            );
         }
     }
 
-    public void ElevatorFineTune(double input){
-        Commands.run(() -> elevatorSubsystem.ElevatorFineTune(input),elevatorSubsystem);
-    }
-
-    public void zeroEleEncoderNoCommands(double input){
-        Commands.run(() -> intakeSubsystem.ArmFineTune(input),elevatorSubsystem);
-    }
-
-    public void ArmFineTune(double input){
-        Commands.run(() -> intakeSubsystem.ArmFineTune(input),elevatorSubsystem);    }
-
-    public void Intake(){
+    public void Intake(double status){
         Commands.runOnce(() -> intakeSubsystem.Intake());
     }
     
-    public void Shoot(){
+    public void Shoot(double status){
         Commands.runOnce(() -> intakeSubsystem.Shoot());
     }
 
     public void Climb(double polarity){
-        Commands.run(() -> ClimbSubsystem.Climb(NeoMotorConstants.kClimberSpeed * polarity));
-    }
-
-    public void StopClimb(){
-       Commands.runOnce(() -> ClimbSubsystem.StopClimb());
+        Commands.runOnce(() -> ClimbSubsystem.Climb(NeoMotorConstants.kClimberSpeed * polarity));
     }
  }

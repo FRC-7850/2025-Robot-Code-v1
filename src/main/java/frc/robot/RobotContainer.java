@@ -2,20 +2,23 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
+ /*
+ * "Theseus' Robot" Reefscape Master Code, Team 7850: C.A.R.D.S
+ * Special thanks to 2181 for their incredible aid and mentorship during this season.
+ */
+
 package frc.robot;
 
-import java.nio.channels.SelectableChannel;
 //Java
-import java.util.List;
 
 //WPILib
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.filter.SlewRateLimiter;
-import edu.wpi.first.wpilibj.DriverStation.Alliance; //TODO What's this for?
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
@@ -27,6 +30,7 @@ import com.pathplanner.lib.commands.PathPlannerAuto;
   //File Structure
 //Constants
 import frc.robot.Constants.OIConstants;
+import frc.robot.Constants.SetPointConstants;
 import frc.robot.Constants.TransformConstants;
 //Subsystems
 import frc.robot.subsystems.DriveSubsystem;
@@ -72,56 +76,96 @@ public class RobotContainer {
   }
 
   /*Robot Button Mappings:
-   * 🎮Drive Controller:
+   * 🎮Driver Controller:
     * Left Joystick: Strafe
     * Right Joystick: Rotate
-    * X: Wheel lock
-    * Y: Barge Toggle
-    * B: Hazard Lights
     * A: Reset Heading
-    * Dpad up: Climber up
-    * Dpad down: Climber down
    * 🎮Operator Controller:
     * Left Trigger: Shoot
     * Left Bumper: Intake
-    * Left Joystick: Elevator Fine-tune
-    * Dpad up: Arm Fine-tune up
-    * Dpad down: Arm Fine-tune up
-   * 🎮Custom Pad:
-    * Button 1:
+    * Right Trigger: Climb in
+    * Right Bumper: Climb out
+   * 🎮Operator Pad:
+    * Button 1: 
     * Button 2:
     * Button 3:
     * Button 4:
     * Button 5:
     * Button 6:
     * Button 7:
+    * Button 8:
    */
   private void configureButtonBindings() {
     //Wheel Lock
     driverController.x().whileTrue(new RunCommand(() -> robotDrive.setX(), robotDrive));
 
     //Barge Controls
-    driverController.povUp().whileTrue(commandController.Climb(1));
-    driverController.povDown().onTrue(commandController.Climb(-1));
-
-    //Elevator Controls
-      //Fine tune
-      operatorController.axisMagnitudeGreaterThan(1, 0.1).whileTrue(commandController.ElevatorFineTune(operatorFilter.calculate(-operatorController.getLeftY())));
-      operatorController.axisMagnitudeGreaterThan(1, 0.1).whileFalse(commandController.ElevatorFineTune(0));
+      //Up
+      driverController.rightTrigger().onTrue(Commands.runOnce(() -> commandController.Climb(1), commandController));
+      driverController.rightTrigger().onFalse(Commands.runOnce(() -> commandController.Climb(0), commandController));
+      //Down
+      driverController.rightBumper().onTrue(Commands.runOnce(() -> commandController.Climb(-1), commandController));
+      driverController.rightBumper().onFalse(Commands.runOnce(() -> commandController.Climb(0), commandController));
 
     // Intake Controls
-      //Arm
-        //Fine tune
-        //TODO which axis is the arm axis?
-        operatorController.axisMagnitudeGreaterThan(4, 0.1).whileTrue(commandController.ElevatorFineTune(operatorFilter.calculate(-operatorController.getLeftY())));
-        operatorController.axisMagnitudeGreaterThan(4, 0.1).whileFalse(commandController.ElevatorFineTune(0));
-      //Intake
-        operatorController.leftBumper().onTrue(commandController.Intake(true));
-        operatorController.leftBumper().onFalse(commandController.Intake(false));
-        operatorController.a(commandController.zeroEleEncoderNoCommands(0));
+      //In
+      operatorController.leftBumper().onTrue(Commands.runOnce(() -> commandController.Intake(1), commandController));
+      operatorController.leftBumper().onFalse(Commands.runOnce(() -> commandController.Intake(0), commandController));
+      //Out
+      driverController.leftBumper().onTrue(Commands.runOnce(() -> commandController.Shoot(1), commandController));
+      driverController.leftBumper().onFalse(Commands.runOnce(() -> commandController.Shoot(0), commandController));
 
     //Setpoint Controls
-    
+      operatorStation.button(SetPointConstants.kFloorSetpointButton).onTrue
+        (Commands.runOnce(() -> commandController.PIDSuperCommand(
+          SetPointConstants.kElevatorFloorSetpoint,
+          SetPointConstants.kArmFloorSetpoint
+        ), commandController));
+
+      operatorStation.button(SetPointConstants.kLollipopSetpointButton).onTrue
+        (Commands.runOnce(() -> commandController.PIDSuperCommand(
+          SetPointConstants.kElevatorAlgaeOnCoralSetpoint,
+          SetPointConstants.kArmAlgaeOnCoralSetpoint
+        ), commandController));
+        
+      operatorStation.button(SetPointConstants.kProcessorSetpointButton).onTrue
+        (Commands.runOnce(() -> commandController.PIDSuperCommand(
+          SetPointConstants.kElevatorProcessorSetpoint,
+          SetPointConstants.kArmProcessorSetpoint
+        ), commandController));
+
+      operatorStation.button(SetPointConstants.kL2SetpointButton).onTrue
+        (Commands.runOnce(() -> commandController.PIDSuperCommand(
+          SetPointConstants.kElevatorL2Setpoint,
+          SetPointConstants.kArmL2Setpoint
+        ), commandController));
+
+      operatorStation.button(SetPointConstants.kL3SetpointButton).onTrue
+        (Commands.runOnce(() -> commandController.PIDSuperCommand(
+          SetPointConstants.kElevatorL3Setpoint,
+          SetPointConstants.kArmL3Setpoint
+        ), commandController));
+
+      operatorStation.button(SetPointConstants.kBargeForwardSetpointButton).onTrue
+        (Commands.runOnce(() -> commandController.PIDSuperCommand(
+          SetPointConstants.kElevatorBargeForwardSetpoint,
+          SetPointConstants.kArmFloorSetpoint
+        ), commandController));
+        
+      operatorStation.button(SetPointConstants.kBargeBackwardSetpointButton).onTrue
+        (Commands.runOnce(() -> commandController.PIDSuperCommand(
+          SetPointConstants.kElevatorBargeBackwardSetpoint,
+          SetPointConstants.kArmFloorSetpoint
+        ), commandController));
+
+      operatorStation.button(SetPointConstants.kHomeSetpointButton).onTrue
+        (Commands.runOnce(() -> commandController.PIDSuperCommand(
+          SetPointConstants.kElevatorFloorSetpoint,
+          SetPointConstants.kArmFloorSetpoint
+        ), commandController));
+
+      
+
     //Pathing Controls
   }
 

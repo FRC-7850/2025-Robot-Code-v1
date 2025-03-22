@@ -3,11 +3,9 @@ package frc.robot.subsystems;
 import static edu.wpi.first.units.Units.Percent;
 import static edu.wpi.first.units.Units.Second;
 
-import java.lang.module.ModuleDescriptor.Requires;
-import java.time.Year;
+
 import java.util.Map;
 
-import org.w3c.dom.css.RGBColor;
 
 import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
@@ -20,7 +18,6 @@ import edu.wpi.first.wpilibj.LEDPattern;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
-import frc.robot.subsystems.ElevatorSubsystem;
 
 public class LEDs extends SubsystemBase{
 

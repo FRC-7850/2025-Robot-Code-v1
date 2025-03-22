@@ -10,8 +10,6 @@ import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 
-import javax.xml.crypto.dsig.keyinfo.RetrievalMethod;
-
 //Rev
 import com.revrobotics.spark.SparkLimitSwitch;
 import com.revrobotics.spark.SparkMax;
@@ -57,8 +55,8 @@ public class ElevatorSubsystem extends SubsystemBase{
           turnRate = elevatorDebug.add("Spark Velocity", 0).withWidget(BuiltInWidgets.kGraph).getEntry();
           eleSP = elevatorDebug.add("SetPoint",0).getEntry();
 
-          //Initialize
-          zeroEleEncoder();  
+           //PID nullified on startup
+           SetGoal(getEleEncoder());  
      }
 
      //Reference Methods
@@ -81,10 +79,6 @@ public class ElevatorSubsystem extends SubsystemBase{
           eleSP.setDouble(goal);
      }
 
-     public void setAntiGravity(){
-          leftMotor.setVoltage(ElevatorConstants.kG);
-     }
-
      public double calculatePID(){
           return elevatorPID.calculate(getEleEncoder()) + 
           elevatorFeedForward.calculate(elevatorPID.getSetpoint().velocity);
@@ -94,7 +88,7 @@ public class ElevatorSubsystem extends SubsystemBase{
           leftMotor.setVoltage(calculatePID());
      }
 
-     public boolean atGoal(){
+     public boolean AtGoal(){
           return elevatorPID.atGoal();
      }
      
@@ -106,5 +100,8 @@ public class ElevatorSubsystem extends SubsystemBase{
 
          //Safeguard
          if(bottomSwitch.isPressed()){zeroEleEncoder();}
+
+         //Run PID
+         gotoPosition();
      }
 }

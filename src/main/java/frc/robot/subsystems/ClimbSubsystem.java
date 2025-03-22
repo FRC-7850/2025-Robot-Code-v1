@@ -30,7 +30,7 @@ public class ClimbSubsystem extends SubsystemBase{
         Id51Speed = climberTestingTab.add("Id 51", 0).withWidget(BuiltInWidgets.kGraph).getEntry();
     }
 
-    public static void Climb(double polarity){
+    public void Climb(double polarity){
         climbMotor.set(polarity);
     }
 

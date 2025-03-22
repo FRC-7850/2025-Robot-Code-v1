@@ -15,26 +15,30 @@ import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants;
 import frc.robot.Constants.ArmConstants;
 
 public class IntakeSubsystem extends SubsystemBase{
      ShuffleboardTab intakeTestingTab = Shuffleboard.getTab("IntakeTestingTab");
      GenericEntry encoderReadout;
      GenericEntry kP, kV, SetPoint, instantVelocity, Eq1, kA, kD, kG, kI, setVoltage;
+     public double setpointReference;
 
           private ArmFeedforward armFeedForward = new ArmFeedforward(ArmConstants.kS, ArmConstants.kG,
           ArmConstants.kV, ArmConstants.kA);
      private ProfiledPIDController armPID = new ProfiledPIDController(ArmConstants.kP, ArmConstants.kI, ArmConstants.kD, new TrapezoidProfile.Constraints(
               20,
-              20));
+              10));
 
      private final SparkMax m_armMotorLeft = new SparkMax(OIConstants.kArmCanIDLeft, MotorType.kBrushless);
      // private final SparkMax m_armMotorRight = new SparkMax(OIConstants.kArmCanIDRight, MotorType.kBrushed); //Unused
      private final SparkMax m_intakeMotorLeft = new SparkMax(OIConstants.kIntakeCanIDLeft, MotorType.kBrushless);
      private final SparkMax m_intakeMotorRight = new SparkMax(OIConstants.kIntakeCanIDRight, MotorType.kBrushless);
-     private double encoderOffset = 2.094;
+     private double encoderOffset = 1.944;
      public double voltage;
      public double condom;
+     //For precise shots in the barge where only the top motors push it in. true when shooting backward, false when shooting forward
+     public boolean bargeFlip = true;
      
      public void RunArm(double polarity){
                m_armMotorLeft.set(polarity);
@@ -46,12 +50,19 @@ public class IntakeSubsystem extends SubsystemBase{
         System.out.println("RunIntake" + polarity);
    }
 
-     public double getArmEncoder(){
-          return m_armMotorLeft.getAlternateEncoder().getPosition() * 6.2832 + encoderOffset;
+     public void RunIntakePrecise(int status){
+       if(bargeFlip){
+          m_intakeMotorRight.set(-status);
+       }
+       else{m_intakeMotorLeft.set(status);}
      }
 
-     public double getArmAbsoluteEncoder(){
-          return m_armMotorLeft.getAbsoluteEncoder().getPosition();
+     public void FlipBarge(boolean flip){
+          bargeFlip = flip;
+     }
+
+     public double getArmEncoder(){
+          return m_armMotorLeft.getAlternateEncoder().getPosition() * 6.2832 + encoderOffset;
      }
 
      public void zeroArmEncoder(){
@@ -101,9 +112,9 @@ public class IntakeSubsystem extends SubsystemBase{
      //      return(armFeedForward.getKg());
      // }
 
-     public void setSetpoint(){
-          armPID.setGoal(SetPoint.get().getDouble());
-     }
+     // public void setSetpoint(){
+     //      armPID.setGoal(SetPoint.get().getDouble());
+     // }
 
      public void setSetpointButton(double goal){
           armPID.setGoal(goal);
@@ -113,8 +124,20 @@ public class IntakeSubsystem extends SubsystemBase{
           return armPID.atGoal();
      }
 
-     public void setSetpointneg80(){
-          armPID.setGoal(-96);
+     // public void setSetpointneg80(){
+     //      armPID.setGoal(-96);
+     // }
+
+      public boolean AtGoal(){
+          return armPID.atGoal();
+     }
+
+     // public void setGoalManual(){
+     //      armPID.setGoal(SetPoint.get().getDouble());
+     // }
+
+     public boolean atSafeZone(){
+          return getArmEncoder()<Constants.IntakeConstants.kIntakeSafeEncoderValue;
      }
 
      public IntakeSubsystem(){
@@ -130,12 +153,12 @@ public class IntakeSubsystem extends SubsystemBase{
           kI = intakeTestingTab.add("KI", 0).getEntry();
           armPID.setTolerance(.1);
           setVoltage = intakeTestingTab.add("Input Test Voltage", 0).getEntry();
+          armPID.setGoal(getArmEncoder());
           RunPIDOnStartup();
      }
 
      @Override
      public void periodic() {
-          armPID.setGoal(SetPoint.get().getDouble());
           gotoPosition();
           encoderReadout.setDouble(getArmEncoder());
      }

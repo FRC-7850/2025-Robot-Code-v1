@@ -85,6 +85,7 @@ public class ElevatorSubsystem extends SubsystemBase{
      }
 
      public void gotoPosition(){
+          calculatePID();
           m_leftMotor.setVoltage(voltage);
           calculatedValue.setDouble(voltage);
           FeedForward.setDouble(elevatorFeedForward.calculate(elevatorPID.getSetpoint().velocity));
@@ -95,15 +96,19 @@ public class ElevatorSubsystem extends SubsystemBase{
           + elevatorFeedForward.calculate(elevatorPID.getSetpoint().velocity);
      }
 
-     public void calculatePIDFineTune(){
-          elevatorPID.setGoal(getEleEncoder());
-          voltage = elevatorPID.calculate(getEleEncoder())
-          + elevatorFeedForward.calculate(elevatorPID.getSetpoint().velocity);
-     }
+     // public void calculatePIDFineTune(){
+     //      elevatorPID.setGoal(getEleEncoder());
+     //      voltage = elevatorPID.calculate(getEleEncoder())
+     //      + elevatorFeedForward.calculate(elevatorPID.getSetpoint().velocity);
+     // }
 
-     public boolean PIDAtGoal(){
+     public boolean AtGoal(){
           return elevatorPID.atGoal();
      }
+
+     // public void setGoalManual(){
+     //      elevatorPID.setGoal(eleSP.get().getDouble());
+     // }
 
      
      
@@ -114,19 +119,21 @@ public class ElevatorSubsystem extends SubsystemBase{
 
                //double speed = eleSetSpeed * polarity;
                m_leftMotor.set(speed);;
-               //gotoPosition(getEleEncoder());
           // }
      }
 
-     public void setSetpoint(){
-          elevatorPID.setGoal(eleSP.get().getDouble());
-     }
+     // public void setSetpoint(){
+     //      elevatorPID.setGoal(eleSP.get().getDouble());
+     // }
 
      public void setSetpointButton(double goal){
           elevatorPID.setGoal(goal);
+          System.out.println("Run elevator to setpoint");
+          gotoPosition();
      }
 
      public ElevatorSubsystem(){
+          elevatorPID.setGoal(0);
           turns = elevatorTestingTab.add("Encoder Readout", 0).getEntry();
           turnRate = elevatorTestingTab.add("Spark2 Velocity", 0).getEntry();
           eleSP = elevatorTestingTab.add("Setpoint", 0).getEntry();
@@ -143,6 +150,7 @@ public class ElevatorSubsystem extends SubsystemBase{
      public void periodic() {
          turns.setDouble(getEleEncoder());
          turnRate.setDouble(getSpeedLeft());
+         gotoPosition();
 
          if(m_leftMotor.getReverseLimitSwitch().isPressed()){
           zeroEleEncoder();

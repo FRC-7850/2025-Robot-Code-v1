@@ -6,7 +6,10 @@
     "JustMove",
     "1Algae"
   ],
-  "autoFolders": [],
+  "autoFolders": [
+    "Test",
+    "Production"
+  ],
   "defaultMaxVel": 3.0,
   "defaultMaxAccel": 3.0,
   "defaultMaxAngVel": 540.0,

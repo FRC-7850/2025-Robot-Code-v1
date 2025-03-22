@@ -4,6 +4,8 @@
 
 package frc.robot;
 
+import com.pathplanner.lib.config.PIDConstants;
+
 import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
@@ -132,6 +134,10 @@ public final class Constants {
     // Constraint for the motion profiled robot angle controller
     public static final TrapezoidProfile.Constraints kThetaControllerConstraints = new TrapezoidProfile.Constraints(
         kMaxAngularSpeedRadiansPerSecond, kMaxAngularSpeedRadiansPerSecondSquared);
+
+    //PathPlanner Controls
+    public static final PIDConstants kAutoTranslationPIDConstants = new PIDConstants(5,0,0);
+    public static final PIDConstants kAutoRotationPIDConstants = new PIDConstants(5,0,0);
   }
 
   public static final class NeoMotorConstants {
@@ -148,10 +154,13 @@ public final class Constants {
 
   public static final class ArmConstants{
 
-    public static final double kS = .125, kG = .225, kV = 4, kA = 2, kP = 3, kI = 0, kD = 0; //kv = .162, kp = .25
+    public static final double kS = .125, kG = .225, kV = 7, kA = 2, kP = 3.5, kI = 0, kD = 0; //kv = .162, kp = .25
   }
 
   public static final class IntakeConstants{
+    public static final double kIntakeSafeEncoderValue = .85;
+    public static final double kIntakeSafeEncoderValueAdjusted = .7;
+    public static final double kIntakePIDCutoffRange = .1;
     public static final int kUpButton = 2;
     public static final int kDownButton = 1;
     public static final double kIntakeSpeed = 1;
@@ -163,8 +172,8 @@ public final class Constants {
     public static final int kBargeForwardSetpointButton = 1;
     public static final int kBargeBackwardSetpointButton = 2;
     public static final int kProcessorSetpointButton = 3;
-    public static final int kL3SetpointButton = 5;
-    public static final int kL2SetpointButton = 4;
+    public static final int kL3SetpointButton = 4;
+    public static final int kL2SetpointButton = 5;
     public static final int kAlgaeOnCoralSetpointButton = 6;
     public static final int kAlgaeOnFloorSetpointButton = 7;
     public static final int kHomePositionButton = 8;
@@ -173,23 +182,22 @@ public final class Constants {
       //Elevator
       public static final double kElevatorBargeForwardSetpoint = 118;
       public static final double kElevatorBargeBackwardSetpoint = 118;
-      public static final double kElevatorProcessorSetpoint = 22;
-      public static final double kElevatorL3Setpoint = 37;
-      public static final double kElevatorL2Setpoint = 67;
+      public static final double kElevatorProcessorSetpoint = 18;
+      public static final double kElevatorL3Setpoint = 64;
+      public static final double kElevatorL2Setpoint = 30;
       public static final double kElevatorAlgaeOnCoralSetpoint = 4;
-      public static final double kElevatorFloorSetpoint = 13;
+      public static final double kElevatorFloorSetpoint = 8;
       public static final double kElevatorHomePositionSetpoint = 0;
 
        //Arm
-       public static final double kArmBargeForwardSetpoint = -45;
+       public static final double kArmBargeForwardSetpoint = 1.1;
        public static final double kArmBargeBackwardSetpoint = 2.1;
-       public static final double kArmProcessorSetpoint = -90;
-       public static final double kArmL3Setpoint = -69;
-       public static final double kArmL2Setpoint = -69;
-       public static final double kArmAlgaeOnCoralSetpoint = -76;
-       public static final double kArmFloorSetpoint = -.5;
+       public static final double kArmProcessorSetpoint = -.3;
+       public static final double kArmL3Setpoint = .5;
+       public static final double kArmL2Setpoint = .5;
+       public static final double kArmAlgaeOnCoralSetpoint = 0;
+       public static final double kArmFloorSetpoint = -.4;
        public static final double kArmOutSetpoint = 0;
-       public static final double kArmHomePositionSetpoint = 0;
-
+       public static final double kArmHomePositionSetpoint = 1.944;
   }
 }

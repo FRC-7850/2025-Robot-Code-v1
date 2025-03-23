@@ -184,9 +184,9 @@ public final class Constants {
       public static final double kElevatorBargeBackwardSetpoint = 118;
       public static final double kElevatorProcessorSetpoint = 18;
       public static final double kElevatorL3Setpoint = 64;
-      public static final double kElevatorL2Setpoint = 30;
+      public static final double kElevatorL2Setpoint = 25;
       public static final double kElevatorAlgaeOnCoralSetpoint = 4;
-      public static final double kElevatorFloorSetpoint = 8;
+      public static final double kElevatorFloorSetpoint = 4;
       public static final double kElevatorHomePositionSetpoint = 0;
 
        //Arm

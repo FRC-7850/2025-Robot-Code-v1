@@ -188,6 +188,8 @@ public final class Constants {
       public static final double kElevatorAlgaeOnCoralSetpoint = 4;
       public static final double kElevatorFloorSetpoint = 4;
       public static final double kElevatorHomePositionSetpoint = 0;
+      public static final double kElevatorCoralPositionSetpoint = 30; //TODO
+
 
        //Arm
        public static final double kArmBargeForwardSetpoint = 1.1;
@@ -199,5 +201,7 @@ public final class Constants {
        public static final double kArmFloorSetpoint = -.4;
        public static final double kArmOutSetpoint = 0;
        public static final double kArmHomePositionSetpoint = 1.944;
+       public static final double kArmHomeCoralSetpoint = -.1; //TODO
+
   }
 }

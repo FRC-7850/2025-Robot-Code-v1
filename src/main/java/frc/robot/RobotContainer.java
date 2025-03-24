@@ -25,32 +25,19 @@ import com.pathplanner.lib.commands.PathPlannerAuto;
 
 import frc.robot.subsystems.LEDs;
 
-//import edu.wpi.first.wpilibj2.command.button.PS4Controller;
-//import edu.wpi.first.wpilibj.PS4Controller;
-/*
- * This class is where the bulk of the robot should be declared.  Since Command-based is a
- * "declarative" paradigm, very little robot logic should actually be handled in the {@link Robot}
- * periodic methods (other than the scheduler calls).  Instead, the structure of the robot
- * (including subsystems, commands, and button mappings) should be declared here.
- */
 public class RobotContainer {
-  // The robot's subsystems
+  //Subsystems
   private final DriveSubsystem m_robotDrive = new DriveSubsystem();
   private final ElevatorSubsystem m_robotElevator = new ElevatorSubsystem();
   private final IntakeSubsystem m_robotIntake = new IntakeSubsystem();
   private final ClimbSubsystem m_robotClimber = new ClimbSubsystem();
-  private final CommandController commandController = new CommandController(m_robotIntake, m_robotElevator);
   private final LEDs m_leds = new LEDs(m_robotElevator);
 
-  // The robot controllers
+  //Controllers
   XboxController m_driverController = new XboxController(OIConstants.kDriverControllerPort);
   CommandXboxController m_operatorController = new CommandXboxController(OIConstants.kOperationsControllerPort);
   CommandJoystick m_operatorStation = new CommandJoystick(OIConstants.kButtonPanelControllerPort);
-//   CommandJoystick m_operatorStation = new CommandJoystick(OIConstants.kButtonPanelControllerPort);
 
-  /**
-   * The container for the robot. Contains subsystems, OI devices, and commands.
-   */
   public RobotContainer() {
     // Configure NamedCommands for PathPlanner
     NamedCommands.registerCommand("PidToL2", 
@@ -58,6 +45,11 @@ public class RobotContainer {
          .andThen(Commands.waitUntil(() -> m_robotIntake.atSafeZone()))
          .andThen(Commands.runOnce(() -> m_robotElevator.setSetpointButton(SetPointConstants.kElevatorL2Setpoint)))
     );    
+    NamedCommands.registerCommand("PidToCoral", 
+       Commands.runOnce(() -> m_robotIntake.setSetpointButton(SetPointConstants.kArmL2Setpoint))
+         .andThen(Commands.waitUntil(() -> m_robotIntake.atSafeZone()))
+         .andThen(Commands.runOnce(() -> m_robotElevator.setSetpointButton(SetPointConstants.kElevatorL2Setpoint)))
+    );
     NamedCommands.registerCommand("PidToL3",
     Commands.runOnce(() -> m_robotIntake.setSetpointButton(SetPointConstants.kArmL2Setpoint))
          .andThen(Commands.waitUntil(() -> m_robotIntake.atSafeZone()))
@@ -76,10 +68,9 @@ public class RobotContainer {
     NamedCommands.registerCommand("IntakeStop", 
       Commands.runOnce(() -> m_robotIntake.RunIntake(0), m_robotIntake)
     );
-    NamedCommands.registerCommand("Shoot", getAutonomousCommand());
-    NamedCommands.registerCommand("ShootSlow", getAutonomousCommand());
-    NamedCommands.registerCommand("ShootStop", getAutonomousCommand());
-
+    NamedCommands.registerCommand("Shoot",
+      Commands.runOnce(() -> m_robotIntake.RunIntake(-1))
+    );
 
     // Configure the button bindings
     configureButtonBindings();
@@ -104,18 +95,11 @@ public class RobotContainer {
             () -> m_robotDrive.setX(),
             m_robotDrive));
 
+    //Attempt to be able to zero the gyro in uptime
     new JoystickButton(m_driverController, Button.kR2.value)
         .whileTrue(Commands.runOnce(
             () -> m_robotDrive.resetGyro(),
-            m_robotDrive)); 
-
-    //Elevator Fine-tune
-    // m_operatorController.axisMagnitudeGreaterThan(1, 0.1).whileTrue(Commands.run(() -> m_robotElevator.RunElevator(-m_operatorController.getLeftY())));
-    // m_operatorController.axisMagnitudeGreaterThan(1, 0.1).onFalse(Commands.runOnce(() -> m_robotElevator.setAntiGravity()));
-
-    //Arm Fine-tune 
-    // m_operatorController.axisMagnitudeGreaterThan(5, 0.2).whileTrue(Commands.run(() -> m_robotIntake.RunArm(-m_operatorController.getRightY() * 0.2)));
-    // m_operatorController.axisMagnitudeGreaterThan(5, 0.2).onFalse(Commands.runOnce(() -> m_robotIntake.RunArm(0)));
+            m_robotDrive));
 
       //Intake
     //Triggers
@@ -197,6 +181,8 @@ public class RobotContainer {
     m_operatorController.rightBumper().onTrue(Commands.runOnce(() -> m_robotClimber.Climb(1)));
     m_operatorController.rightBumper().onFalse(Commands.runOnce(() -> m_robotClimber.Climb(0)));
     m_operatorController.rightTrigger().onTrue(Commands.runOnce(() -> m_robotClimber.Climb(-1)));
+
+    //Alignment controls (Vision)
   }
 
   /**

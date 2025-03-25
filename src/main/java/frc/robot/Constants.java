@@ -7,6 +7,7 @@ package frc.robot;
 import com.pathplanner.lib.config.PIDConstants;
 
 import edu.wpi.first.math.controller.ElevatorFeedforward;
+import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
@@ -184,12 +185,11 @@ public final class Constants {
       public static final double kElevatorBargeBackwardSetpoint = 118;
       public static final double kElevatorProcessorSetpoint = 18;
       public static final double kElevatorL3Setpoint = 64;
-      public static final double kElevatorL2Setpoint = 25;
-      public static final double kElevatorAlgaeOnCoralSetpoint = 4;
-      public static final double kElevatorFloorSetpoint = 4;
+      public static final double kElevatorL2Setpoint = 28.5;
+      public static final double kElevatorAlgaeOnCoralSetpoint = 6.5;
+      public static final double kElevatorFloorSetpoint = 6;
       public static final double kElevatorHomePositionSetpoint = 0;
       public static final double kElevatorCoralPositionSetpoint = 30; //TODO
-
 
        //Arm
        public static final double kArmBargeForwardSetpoint = 1.1;
@@ -198,10 +198,12 @@ public final class Constants {
        public static final double kArmL3Setpoint = .5;
        public static final double kArmL2Setpoint = .5;
        public static final double kArmAlgaeOnCoralSetpoint = 0;
-       public static final double kArmFloorSetpoint = -.4;
+       public static final double kArmFloorSetpoint = -.45;
        public static final double kArmOutSetpoint = 0;
        public static final double kArmHomePositionSetpoint = 1.944;
        public static final double kArmHomeCoralSetpoint = -.1; //TODO
-
+  }
+  public static final class TransformConstants{
+    public static final Transform3d kCameraToRobot = null;
   }
 }

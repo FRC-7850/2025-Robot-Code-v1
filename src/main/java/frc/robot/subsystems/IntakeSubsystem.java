@@ -34,7 +34,7 @@ public class IntakeSubsystem extends SubsystemBase{
      // private final SparkMax m_armMotorRight = new SparkMax(OIConstants.kArmCanIDRight, MotorType.kBrushed); //Unused
      private final SparkMax m_intakeMotorLeft = new SparkMax(OIConstants.kIntakeCanIDLeft, MotorType.kBrushless);
      private final SparkMax m_intakeMotorRight = new SparkMax(OIConstants.kIntakeCanIDRight, MotorType.kBrushless);
-     private double encoderOffset = 1.944;
+     private double encoderOffset = 2.061;
      public double voltage;
      public double condom;
      //For precise shots in the barge where only the top motors push it in. true when shooting backward, false when shooting forward
@@ -51,10 +51,12 @@ public class IntakeSubsystem extends SubsystemBase{
    }
 
      public void RunIntakePrecise(int status){
-       if(bargeFlip){
-          m_intakeMotorRight.set(-status);
-       }
-       else{m_intakeMotorLeft.set(status);}
+     //   if(bargeFlip){
+     //      m_intakeMotorRight.set(-status);
+     //   }
+     //   else{m_intakeMotorLeft.set(status);}
+     m_intakeMotorRight.set(-status * 0.65);
+     m_intakeMotorLeft.set(status * 0.65);
      }
 
      public void FlipBarge(boolean flip){

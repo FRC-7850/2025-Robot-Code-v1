@@ -278,5 +278,6 @@ public class DriveSubsystem extends SubsystemBase {
 
   public void resetGyro(){
     m_gyro.reset();
+    resetOdometry(getPose());
   }
 }

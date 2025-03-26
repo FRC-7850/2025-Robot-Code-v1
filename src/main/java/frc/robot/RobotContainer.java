@@ -42,7 +42,7 @@ public class RobotContainer {
   private final DriveSubsystem m_robotDrive = new DriveSubsystem();
   private final ElevatorSubsystem m_robotElevator = new ElevatorSubsystem();
   private final IntakeSubsystem m_robotIntake = new IntakeSubsystem();
-  private final ClimbSubsystem m_robotClimber = new ClimbSubsystem();
+  // private final ClimbSubsystem m_robotClimber = new ClimbSubsystem();
 
   //Controllers
   XboxController m_driverController = new XboxController(OIConstants.kDriverControllerPort);
@@ -59,12 +59,6 @@ public class RobotContainer {
   }
 
   public RobotContainer() {
-    //Sendable Chooser
-    autoChooser = AutoBuilder.buildAutoChooser();
-
-    //Putc chooser to dashboard
-    SmartDashboard.putData("Auto Chooser", autoChooser);
-
     // Configure NamedCommands for PathPlanner
     NamedCommands.registerCommand("PidToL2", 
        Commands.runOnce(() -> m_robotIntake.setSetpointButton(SetPointConstants.kArmL2Setpoint))
@@ -76,7 +70,11 @@ public class RobotContainer {
          .andThen(Commands.waitUntil(() -> m_robotIntake.atSafeZone()))
          .andThen(Commands.runOnce(() -> m_robotElevator.setSetpointButton(SetPointConstants.kElevatorL2Setpoint)))
     );
-    NamedCommands.registerCommand("PidToL3", AutosL3Command());
+    NamedCommands.registerCommand("PidToL3", 
+      Commands.runOnce(() -> m_robotIntake.setSetpointButton(SetPointConstants.kArmL3Setpoint))
+      .andThen(Commands.waitUntil(() -> m_robotIntake.atSafeZone()))
+      .andThen(Commands.runOnce(() -> m_robotElevator.setSetpointButton(SetPointConstants.kElevatorL3Setpoint)))
+    );
     NamedCommands.registerCommand("PidToBackwardsBarge",
     Commands.runOnce(() -> m_robotIntake.setSetpointButton(SetPointConstants.kArmOutSetpoint))
       .andThen(Commands.waitUntil(() -> m_robotIntake.atSafeZone()))
@@ -96,7 +94,7 @@ public class RobotContainer {
 
     // Configure the button bindings
     configureButtonBindings();
-    
+
     // Configure default commands
     m_robotDrive.setDefaultCommand(
         // The left stick controls translation of the robot.
@@ -108,6 +106,12 @@ public class RobotContainer {
                 -MathUtil.applyDeadband(m_driverController.getRightX(), OIConstants.kDriveDeadband),
                 true),
             m_robotDrive));
+
+  //Sendable Chooser
+  autoChooser = AutoBuilder.buildAutoChooser();
+
+  //Putc chooser to dashboard
+  SmartDashboard.putData("Auto Chooser", autoChooser);
   }
 
   private void configureButtonBindings() {

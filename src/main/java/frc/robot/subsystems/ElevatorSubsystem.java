@@ -1,42 +1,19 @@
 package frc.robot.subsystems;
-import java.util.function.BooleanSupplier;
 
-import com.ctre.phoenix6.controls.DifferentialVoltage;
-import com.ctre.phoenix6.signals.DiffPIDOutput_PIDOutputModeValue;
-import com.revrobotics.servohub.ServoHub.ResetMode;
-import com.revrobotics.servohub.config.ServoHubParameter;
-import com.revrobotics.spark.ClosedLoopSlot;
-import com.revrobotics.spark.SparkBase;
 import com.revrobotics.spark.SparkMax;
-import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkLimitSwitch;
-import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants;
-import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.ElevatorConstants;
 import frc.robot.Constants.OIConstants;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
-import com.revrobotics.spark.config.SparkBaseConfig;
-import com.revrobotics.spark.config.SparkMaxConfig;
 
-import edu.wpi.first.wpilibj.RobotController;
-import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
-//import edu.wpi.first.math.controller.SimpleMotorFeedForward;
 import edu.wpi.first.networktables.GenericEntry;
-import edu.wpi.first.units.measure.Velocity;
-import edu.wpi.first.util.sendable.SendableRegistry;
 import edu.wpi.first.math.controller.ElevatorFeedforward;
-//import edu.wpi.first.wpilibj.PIDController;
-//import edu.wpi.first.contr
-
-
 
 public class ElevatorSubsystem extends SubsystemBase{
      ShuffleboardTab elevatorTestingTab = Shuffleboard.getTab("ElevatorTestingTab");

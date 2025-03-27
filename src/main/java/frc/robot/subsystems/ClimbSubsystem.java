@@ -22,7 +22,7 @@ public class ClimbSubsystem extends SubsystemBase{
          GenericEntry Id50Speed;
          GenericEntry Id51Speed;
     private static final SparkMax climbMotor = new SparkMax(OIConstants.kClimberCanId, MotorType.kBrushless);
-    private static final SparkMax climbFollower = new SparkMax(51, MotorType.kBrushless);
+    // private static final SparkMax climbFollower = new SparkMax(51, MotorType.kBrushless); //Unused
     public static RelativeEncoder motorEncoder = climbMotor.getEncoder();
 
     public ClimbSubsystem(){

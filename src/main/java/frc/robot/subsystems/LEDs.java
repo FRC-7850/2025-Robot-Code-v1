@@ -3,13 +3,7 @@ package frc.robot.subsystems;
 import static edu.wpi.first.units.Units.Percent;
 import static edu.wpi.first.units.Units.Second;
 
-import java.lang.module.ModuleDescriptor.Requires;
-import java.time.Year;
 import java.util.Map;
-import java.util.concurrent.CyclicBarrier;
-import java.util.function.IntToDoubleFunction;
-
-import org.w3c.dom.css.RGBColor;
 
 import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.wpilibj.AddressableLED;
@@ -25,7 +19,6 @@ import edu.wpi.first.wpilibj.LEDPattern;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
-import frc.robot.subsystems.ElevatorSubsystem;
 
 public class LEDs extends SubsystemBase{
     ShuffleboardTab LEDTestingTab = Shuffleboard.getTab("LED Testing");
@@ -153,15 +146,6 @@ public class LEDs extends SubsystemBase{
       m_led.setData(m_ledBuffer);
     }
 
-    
-    private Color RGB2RBG(Color color) {
-        //Our LEDs are GRB type, and as such will show green when we want our delightful red team color. 
-        //In order to mitigate this, we will convert RGB to GBR for the colors we need to use.
-        //Color resultColor = new Color(color.green,color.red,color.blue);
-        Color resultColor = new Color(color.red,color.blue,color.green);
-        
-        return resultColor;
-    }
     private Color RGB2GRB(Color color) {
         //Our LEDs are GRB type, and as such will show green when we want our delightful red team color. 
         //In order to mitigate this, we will convert RGB to GBR for the colors we need to use.

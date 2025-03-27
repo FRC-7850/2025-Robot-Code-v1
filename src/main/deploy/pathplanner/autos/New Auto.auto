@@ -7,43 +7,31 @@
         {
           "type": "path",
           "data": {
-            "pathName": "JustMove1"
+            "pathName": "BenchmarkPath"
           }
         },
         {
           "type": "named",
           "data": {
-            "name": null
+            "name": "PidToL3"
           }
         },
         {
           "type": "wait",
           "data": {
-            "waitTime": 5.0
+            "waitTime": 3.0
           }
         },
         {
           "type": "named",
           "data": {
-            "name": null
-          }
-        },
-        {
-          "type": "wait",
-          "data": {
-            "waitTime": 0.0
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": null
+            "name": "Intake"
           }
         }
       ]
     }
   },
   "resetOdom": true,
-  "folder": "Test",
+  "folder": "Production",
   "choreoAuto": false
 }

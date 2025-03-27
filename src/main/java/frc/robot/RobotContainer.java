@@ -29,10 +29,11 @@ import com.pathplanner.lib.auto.NamedCommands;
 import frc.robot.Constants.OIConstants;
 import frc.robot.Constants.SetPointConstants;
 //Subsystems
-import frc.robot.subsystems.ClimbSubsystem;
+// import frc.robot.subsystems.ClimbSubsystem;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.ElevatorSubsystem;
 import frc.robot.subsystems.IntakeSubsystem;
+import frc.robot.subsystems.LEDs;
 
 
 public class RobotContainer {
@@ -42,6 +43,7 @@ public class RobotContainer {
   private final DriveSubsystem m_robotDrive = new DriveSubsystem();
   private final ElevatorSubsystem m_robotElevator = new ElevatorSubsystem();
   private final IntakeSubsystem m_robotIntake = new IntakeSubsystem();
+  private final LEDs m_LEDs = new LEDs(m_robotElevator);
   // private final ClimbSubsystem m_robotClimber = new ClimbSubsystem();
 
   //Controllers
@@ -109,8 +111,6 @@ public class RobotContainer {
 
   //Sendable Chooser
   autoChooser = AutoBuilder.buildAutoChooser();
-
-  //Putc chooser to dashboard
   SmartDashboard.putData("Auto Chooser", autoChooser);
   }
 
@@ -147,61 +147,71 @@ public class RobotContainer {
          .andThen(Commands.runOnce(() -> m_robotElevator.setSetpointButton(SetPointConstants.kElevatorFloorSetpoint))), 
         ()-> m_robotIntake.atSafeZone()));
     m_operatorStation.button(SetPointConstants.kProcessorSetpointButton).onTrue(
-      Commands.runOnce(() -> m_robotIntake.setSetpointButton(SetPointConstants.kArmOutSetpoint))
-      .andThen(Commands.waitUntil(() -> m_robotIntake.atSafeZone()))
-      .andThen(Commands.runOnce(() -> m_robotElevator.setSetpointButton(SetPointConstants.kElevatorProcessorSetpoint)))
-      .andThen(Commands.waitUntil(() -> m_robotElevator.AtGoal()))
-      .andThen(Commands.runOnce(() -> m_robotIntake.setSetpointButton(SetPointConstants.kArmProcessorSetpoint)))
-    );
+      Commands.either(
+        Commands.runOnce(() -> m_robotElevator.setSetpointButton(SetPointConstants.kElevatorProcessorSetpoint))
+       .andThen(Commands.runOnce(() -> m_robotIntake.setSetpointButton(SetPointConstants.kArmProcessorSetpoint))),
+       Commands.runOnce(() -> m_robotIntake.setSetpointButton(SetPointConstants.kArmProcessorSetpoint))
+         .andThen(Commands.waitUntil(() -> m_robotIntake.atSafeZone()))
+         .andThen(Commands.runOnce(() -> m_robotElevator.setSetpointButton(SetPointConstants.kElevatorProcessorSetpoint))), 
+        ()-> m_robotIntake.atSafeZone()));
     m_operatorStation.button(SetPointConstants.kAlgaeOnCoralSetpointButton).onTrue(
-      Commands.runOnce(() -> m_robotIntake.setSetpointButton(SetPointConstants.kArmOutSetpoint))
-      .andThen(Commands.waitUntil(() -> m_robotIntake.atSafeZone()))
-      .andThen(Commands.runOnce(() -> m_robotElevator.setSetpointButton(SetPointConstants.kElevatorAlgaeOnCoralSetpoint)))
-      .andThen(Commands.waitUntil(() -> m_robotElevator.AtGoal()))
-      .andThen(Commands.runOnce(() -> m_robotIntake.setSetpointButton(SetPointConstants.kArmAlgaeOnCoralSetpoint)))
-    );
+      Commands.either(
+        Commands.runOnce(() -> m_robotElevator.setSetpointButton(SetPointConstants.kElevatorAlgaeOnCoralSetpoint))
+       .andThen(Commands.runOnce(() -> m_robotIntake.setSetpointButton(SetPointConstants.kArmAlgaeOnCoralSetpoint))),
+       Commands.runOnce(() -> m_robotIntake.setSetpointButton(SetPointConstants.kArmAlgaeOnCoralSetpoint))
+         .andThen(Commands.waitUntil(() -> m_robotIntake.atSafeZone()))
+         .andThen(Commands.runOnce(() -> m_robotElevator.setSetpointButton(SetPointConstants.kElevatorAlgaeOnCoralSetpoint))), 
+        ()-> m_robotIntake.atSafeZone()));
     m_operatorStation.button(SetPointConstants.kL2SetpointButton).onTrue(
-      Commands.runOnce(() -> m_robotIntake.setSetpointButton(SetPointConstants.kArmOutSetpoint))
-      .andThen(Commands.waitUntil(() -> m_robotIntake.atSafeZone()))
-      .andThen(Commands.runOnce(() -> m_robotElevator.setSetpointButton(SetPointConstants.kElevatorL2Setpoint)))
-      .andThen(Commands.waitUntil(() -> m_robotElevator.AtGoal()))
-      .andThen(Commands.runOnce(() -> m_robotIntake.setSetpointButton(SetPointConstants.kArmL2Setpoint)))
-    );
+      Commands.either(
+        Commands.runOnce(() -> m_robotElevator.setSetpointButton(SetPointConstants.kElevatorL2Setpoint))
+       .andThen(Commands.runOnce(() -> m_robotIntake.setSetpointButton(SetPointConstants.kArmL2Setpoint))),
+       Commands.runOnce(() -> m_robotIntake.setSetpointButton(SetPointConstants.kArmL2Setpoint))
+         .andThen(Commands.waitUntil(() -> m_robotIntake.atSafeZone()))
+         .andThen(Commands.runOnce(() -> m_robotElevator.setSetpointButton(SetPointConstants.kElevatorL2Setpoint))), 
+        ()-> m_robotIntake.atSafeZone()));
     m_operatorStation.button(SetPointConstants.kL3SetpointButton).onTrue(
-      Commands.runOnce(() -> m_robotIntake.setSetpointButton(SetPointConstants.kArmOutSetpoint))
-      .andThen(Commands.waitUntil(() -> m_robotIntake.atSafeZone()))
-      .andThen(Commands.runOnce(() -> m_robotElevator.setSetpointButton(SetPointConstants.kElevatorL3Setpoint)))
-      .andThen(Commands.waitUntil(() -> m_robotElevator.AtGoal()))
-      .andThen(Commands.runOnce(() -> m_robotIntake.setSetpointButton(SetPointConstants.kArmL3Setpoint)))
-    );
+      Commands.either(
+        Commands.runOnce(() -> m_robotElevator.setSetpointButton(SetPointConstants.kElevatorAlgaeOnCoralSetpoint))
+       .andThen(Commands.runOnce(() -> m_robotIntake.setSetpointButton(SetPointConstants.kArmL3Setpoint))),
+       Commands.runOnce(() -> m_robotIntake.setSetpointButton(SetPointConstants.kArmL3Setpoint))
+         .andThen(Commands.waitUntil(() -> m_robotIntake.atSafeZone()))
+         .andThen(Commands.runOnce(() -> m_robotElevator.setSetpointButton(SetPointConstants.kElevatorAlgaeOnCoralSetpoint))), 
+        ()-> m_robotIntake.atSafeZone()));
     m_operatorStation.button(SetPointConstants.kBargeForwardSetpointButton).onTrue(
-      Commands.runOnce(() -> m_robotIntake.setSetpointButton(SetPointConstants.kArmOutSetpoint))
-      .andThen(Commands.waitUntil(() -> m_robotIntake.atSafeZone()))
-      .andThen(Commands.runOnce(() -> m_robotElevator.setSetpointButton(SetPointConstants.kElevatorBargeForwardSetpoint)))
-      .andThen(Commands.waitUntil(() -> m_robotElevator.AtGoal()))
-      .andThen(Commands.runOnce(() -> m_robotIntake.setSetpointButton(SetPointConstants.kArmBargeForwardSetpoint)))
-    );
+      Commands.either(
+        Commands.runOnce(() -> m_robotElevator.setSetpointButton(SetPointConstants.kElevatorBargeForwardSetpoint))
+       .andThen(Commands.runOnce(() -> m_robotIntake.setSetpointButton(SetPointConstants.kArmBargeForwardSetpoint))),
+       Commands.runOnce(() -> m_robotIntake.setSetpointButton(SetPointConstants.kArmBargeForwardSetpoint))
+         .andThen(Commands.waitUntil(() -> m_robotIntake.atSafeZone()))
+         .andThen(Commands.runOnce(() -> m_robotElevator.setSetpointButton(SetPointConstants.kElevatorBargeForwardSetpoint))), 
+        ()-> m_robotIntake.atSafeZone()));
     m_operatorStation.button(SetPointConstants.kBargeBackwardSetpointButton).onTrue(
-      Commands.runOnce(() -> m_robotIntake.setSetpointButton(SetPointConstants.kArmOutSetpoint))
-      .andThen(Commands.runOnce(() -> m_robotIntake.FlipBarge(true)))
-      .andThen(Commands.waitUntil(() -> m_robotIntake.atSafeZone()))
-      .andThen(Commands.runOnce(() -> m_robotElevator.setSetpointButton(SetPointConstants.kElevatorBargeBackwardSetpoint)))
+      //Old code -------------------------
+    //   Commands.runOnce(() -> m_robotIntake.setSetpointButton(SetPointConstants.kArmOutSetpoint))
+    //   .andThen(Commands.runOnce(() -> m_robotIntake.FlipBarge(true)))
+    //   .andThen(Commands.waitUntil(() -> m_robotIntake.atSafeZone()))
+    //   .andThen(Commands.runOnce(() -> m_robotElevator.setSetpointButton(SetPointConstants.kElevatorBargeBackwardSetpoint)))
+    //   .andThen(Commands.waitUntil(() -> m_robotElevator.AtGoal()))
+    //   .andThen(Commands.runOnce(() -> m_robotIntake.setSetpointButton(SetPointConstants.kArmBargeBackwardSetpoint)))
+    // );
+      //End of old code ----------------------
+    Commands.either(
+      Commands.runOnce(() -> m_robotElevator.setSetpointButton(SetPointConstants.kElevatorBargeBackwardSetpoint), m_robotElevator)
       .andThen(Commands.waitUntil(() -> m_robotElevator.AtGoal()))
-      .andThen(Commands.runOnce(() -> m_robotIntake.setSetpointButton(SetPointConstants.kArmBargeBackwardSetpoint)))
-    );
+      .andThen(Commands.runOnce(() -> m_robotIntake.setSetpointButton(SetPointConstants.kArmBargeBackwardSetpoint), m_robotIntake)),
+      Commands.runOnce(() -> m_robotIntake.setSetpointButton(SetPointConstants.kArmOutSetpoint), m_robotIntake)
+      .andThen(Commands.waitUntil(() -> m_robotIntake.atSafeZone()))
+      .andThen(Commands.runOnce(() -> m_robotElevator.setSetpointButton(SetPointConstants.kElevatorBargeBackwardSetpoint), m_robotElevator))
+      .andThen(Commands.waitUntil(() -> m_robotElevator.AtGoal()))
+      .andThen(Commands.runOnce(() -> m_robotIntake.setSetpointButton(SetPointConstants.kArmBargeBackwardSetpoint), m_robotIntake)),
+      ()-> m_robotIntake.atSafeZone()));
     m_operatorStation.button(SetPointConstants.kHomePositionButton).onTrue(
       Commands.runOnce(() -> m_robotIntake.setSetpointButton(SetPointConstants.kArmOutSetpoint))
       .andThen(Commands.waitUntil(() -> m_robotIntake.atSafeZone()))
       .andThen(Commands.runOnce(() -> m_robotElevator.setSetpointButton(SetPointConstants.kElevatorHomePositionSetpoint)))
       .andThen(Commands.waitUntil(() -> m_robotElevator.AtGoal()))
       .andThen(Commands.runOnce(() -> m_robotIntake.setSetpointButton(SetPointConstants.kArmHomePositionSetpoint)))
-    );
-    m_operatorController.b().onTrue(
-      Commands.runOnce(() -> m_robotIntake.setSetpointButton(SetPointConstants.kArmOutSetpoint))
-      .andThen(Commands.waitUntil(() -> m_robotIntake.atSafeZone()))
-      .andThen(Commands.runOnce(() -> m_robotElevator.setSetpointButton(SetPointConstants.kElevatorCoralPositionSetpoint)))
-      .andThen(Commands.waitUntil(() -> m_robotElevator.AtGoal()))
-      .andThen(Commands.runOnce(() -> m_robotIntake.setSetpointButton(SetPointConstants.kArmHomeCoralSetpoint)))
     );
 
     //climber Controls
